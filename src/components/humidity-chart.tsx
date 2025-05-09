@@ -5,9 +5,8 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 
-// URLs del servidor backend
-const BACKEND_URL = "http://localhost:5000"
-const API_URL = `${BACKEND_URL}/api/humedad`
+// URL del servidor backend (cambia esto para que coincida con la dirección de tu servidor)
+const BACKEND_URL = "http://localhost:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
 
 type HumidityData = {
   valor: number
@@ -18,15 +17,25 @@ export function HumidityChart() {
   const [data, setData] = useState<HumidityData[]>([])
   const [currentValue, setCurrentValue] = useState<number | null>(null)
   const [isConnected, setIsConnected] = useState(false)
+  const [connectionError, setConnectionError] = useState<string | null>(null)
 
   useEffect(() => {
+    console.log("Intentando conectar al socket en:", BACKEND_URL)
+    
     // Conectar al WebSocket
-    const socket = io(BACKEND_URL)
+    const socket = io(BACKEND_URL, {
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      withCredentials: true,
+      timeout: 20000
+    })
 
     // Eventos de conexión
     socket.on("connect", () => {
       console.log("Conectado al servidor WebSocket")
       setIsConnected(true)
+      setConnectionError(null)
     })
 
     socket.on("disconnect", () => {
@@ -35,12 +44,14 @@ export function HumidityChart() {
     })
 
     socket.on("connect_error", (error) => {
-      console.error("Error de conexión al WebSocket:", error)
+      console.error("Error de conexión al WebSocket:", error.message)
+      setConnectionError(error.message)
       setIsConnected(false)
     })
 
     // Escuchar nuevas lecturas
     socket.on("nueva-lectura", (lectura: HumidityData) => {
+      console.log("Nueva lectura recibida:", lectura)
       setCurrentValue(lectura.valor)
       setData(prev => {
         const newData = [lectura, ...prev].slice(0, 20) // Mantener solo los últimos 20 registros
@@ -49,18 +60,23 @@ export function HumidityChart() {
     })
 
     // Obtener datos históricos al cargar
-    fetch(API_URL)
+    fetch(`${BACKEND_URL}/api/humedad`)
       .then(res => res.json())
       .then(historicalData => {
+        console.log("Datos históricos recibidos:", historicalData.length)
         if (Array.isArray(historicalData) && historicalData.length > 0) {
           setData(historicalData.slice(0, 20))
           setCurrentValue(historicalData[0]?.valor || null)
         }
       })
-      .catch(err => console.error("Error al cargar datos históricos:", err))
+      .catch(err => {
+        console.error("Error al cargar datos históricos:", err)
+        setConnectionError("Error al cargar datos históricos")
+      })
 
     // Limpiar al desmontar
     return () => {
+      console.log("Desconectando socket")
       socket.disconnect()
     }
   }, [])
@@ -91,7 +107,7 @@ export function HumidityChart() {
             ) : (
               <span className="ml-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-100">
                 <span className="mr-1 h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                Desconectado
+                Desconectado {connectionError ? `(${connectionError})` : ''}
               </span>
             )}
           </CardDescription>
