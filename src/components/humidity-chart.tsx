@@ -6,7 +6,8 @@ import { format } from "date-fns"
 import { es } from "date-fns/locale"
 
 // URL del servidor backend (cambia esto para que coincida con la dirección de tu servidor)
-const BACKEND_URL = "http://localhost:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
+//const BACKEND_URL = "http://localhost:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
+const BACKEND_URL = "http://192.168.0.64:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
 
 type HumidityData = {
   valor: number
@@ -27,7 +28,7 @@ export function HumidityChart() {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      withCredentials: true,
+      withCredentials: false,
       timeout: 20000
     })
 
