@@ -2,11 +2,12 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { io } from "socket.io-client"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import { format, parseISO } from "date-fns"
+import { format } from "date-fns"
 import { es } from "date-fns/locale"
 
-// URL del servidor backend
+// URLs del servidor backend
 const BACKEND_URL = "http://localhost:5000"
+const API_URL = `${BACKEND_URL}/api/humedad`
 
 type HumidityData = {
   valor: number
@@ -33,6 +34,11 @@ export function HumidityChart() {
       setIsConnected(false)
     })
 
+    socket.on("connect_error", (error) => {
+      console.error("Error de conexión al WebSocket:", error)
+      setIsConnected(false)
+    })
+
     // Escuchar nuevas lecturas
     socket.on("nueva-lectura", (lectura: HumidityData) => {
       setCurrentValue(lectura.valor)
@@ -43,7 +49,7 @@ export function HumidityChart() {
     })
 
     // Obtener datos históricos al cargar
-    fetch(`${BACKEND_URL}/api/humedad`)
+    fetch(API_URL)
       .then(res => res.json())
       .then(historicalData => {
         if (Array.isArray(historicalData) && historicalData.length > 0) {
@@ -162,4 +168,4 @@ export function HumidityChart() {
       </CardContent>
     </Card>
   )
-} 
+}
