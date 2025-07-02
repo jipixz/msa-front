@@ -7,7 +7,9 @@ import { es } from "date-fns/locale"
 
 // URL del servidor backend (cambia esto para que coincida con la dirección de tu servidor)
 //const BACKEND_URL = "http://localhost:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
-const BACKEND_URL = "http://192.168.0.64:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
+//const BACKEND_URL = "http://192.168.0.64:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
+const BACKEND_URL = "https://msabackend.jipixz.com"
+const INACTIVITY_TIMEOUT = 30000; // 30 segundos sin recibir datos
 
 type HumidityData = {
   valor: number
@@ -19,6 +21,8 @@ export function HumidityChart() {
   const [currentValue, setCurrentValue] = useState<number | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const [connectionError, setConnectionError] = useState<string | null>(null)
+  const [lastReadingTime, setLastReadingTime] = useState<number | null>(null)
+  const [isDataStale, setIsDataStale] = useState(false)
 
   useEffect(() => {
     console.log("Intentando conectar al socket en:", BACKEND_URL)
@@ -54,6 +58,8 @@ export function HumidityChart() {
     socket.on("nueva-lectura", (lectura: HumidityData) => {
       console.log("Nueva lectura recibida:", lectura)
       setCurrentValue(lectura.valor)
+      setLastReadingTime(Date.now())
+      setIsDataStale(false)
       setData(prev => {
         const newData = [lectura, ...prev].slice(0, 20) // Mantener solo los últimos 20 registros
         return newData
@@ -68,6 +74,7 @@ export function HumidityChart() {
         if (Array.isArray(historicalData) && historicalData.length > 0) {
           setData(historicalData.slice(0, 20))
           setCurrentValue(historicalData[0]?.valor || null)
+          setLastReadingTime(Date.now())
         }
       })
       .catch(err => {
@@ -81,6 +88,22 @@ export function HumidityChart() {
       socket.disconnect()
     }
   }, [])
+
+  // Verificar si los datos están obsoletos
+  useEffect(() => {
+    if (!lastReadingTime || !isConnected) return;
+    
+    const checkDataFreshness = () => {
+      const now = Date.now();
+      if (now - lastReadingTime > INACTIVITY_TIMEOUT) {
+        setIsDataStale(true);
+      }
+    };
+    
+    const interval = setInterval(checkDataFreshness, 5000); // Verificar cada 5 segundos
+    
+    return () => clearInterval(interval);
+  }, [lastReadingTime, isConnected]);
 
   // Determinar el color y mensaje basado en el nivel de humedad
   const getHumidityStatus = () => {
@@ -109,6 +132,12 @@ export function HumidityChart() {
               <span className="ml-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-100">
                 <span className="mr-1 h-1.5 w-1.5 rounded-full bg-red-500"></span>
                 Desconectado {connectionError ? `(${connectionError})` : ''}
+              </span>
+            )}
+            {isDataStale && isConnected && (
+              <span className="ml-2 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
+                <span className="mr-1 h-1.5 w-1.5 rounded-full bg-yellow-500"></span>
+                Sin lecturas nuevas
               </span>
             )}
           </CardDescription>

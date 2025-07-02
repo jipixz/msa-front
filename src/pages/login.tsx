@@ -1,10 +1,10 @@
-import { cn } from "@/lib/utils"
+//import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export default function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
+export default function LoginForm({ /*className,  ...props */ }: React.ComponentProps<"div">) {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-3xl">

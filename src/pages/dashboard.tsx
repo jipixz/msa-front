@@ -1,12 +1,11 @@
 import { Layout } from "@/components/layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useSession } from "@/lib/auth-client"
-import { Navigate } from "react-router-dom"
+//import { useSession } from "@/lib/auth-client"
 import { HumidityChart } from "@/components/humidity-chart"
-import { Droplet, ThermometerSun, Leaf, Calendar } from "lucide-react"
+import { Droplet, ThermometerSun, Calendar } from "lucide-react"
 
 export default function DashboardPage() {
-  const { data: session } = useSession()
+  //const { data: session } = useSession()
 
   /* if (!session) {
     return <Navigate to="/login" replace />
