@@ -8,7 +8,7 @@ import { es } from "date-fns/locale"
 // URL del servidor backend (cambia esto para que coincida con la dirección de tu servidor)
 //const BACKEND_URL = "http://localhost:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
 //const BACKEND_URL = "http://192.168.0.64:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
-const BACKEND_URL = "https://msabackend.jipixz.com"
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000";
 const INACTIVITY_TIMEOUT = 30000; // 30 segundos sin recibir datos
 
 type HumidityData = {

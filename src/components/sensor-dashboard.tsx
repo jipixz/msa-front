@@ -10,7 +10,7 @@ import { Bell } from "lucide-react"
 
 // URL del servidor backend
 //const BACKEND_URL = "http://192.168.0.64:5000"
-const BACKEND_URL = "https://msabackend.jipixz.com"
+const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:5000";
 const INACTIVITY_TIMEOUT = 30000; // 30 segundos sin recibir datos
 const MAX_DATA_POINTS = 20; // Máximo número de puntos a mostrar en gráficas
 
@@ -390,7 +390,7 @@ export function SensorDashboard() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="w-full h-full space-y-4 overflow-auto p-4 px-8">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Panel de Sensores</h2>
         <div className="flex items-center space-x-2">

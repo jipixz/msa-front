@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { Link, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Home, TrendingUp, Database, Settings, User, Bell, Menu, X, Leaf, BarChart3, MapPin } from "lucide-react"
 
 const navigationItems = [
@@ -31,21 +31,21 @@ const navigationItems = [
 
 export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const pathname = usePathname()
+  const location = useLocation()
 
   return (
-    <nav className="bg-white border-b border-gray-200 shadow-sm">
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo and Brand */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2">
               <div className="p-2 bg-green-100 rounded-lg">
                 <Leaf className="h-6 w-6 text-green-600" />
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-lg font-semibold text-gray-900">AgroMonitor</h1>
-                <p className="text-xs text-gray-500">Sistema de Monitoreo Agrícola</p>
+                <h1 className="text-lg font-semibold text-foreground">AgroMonitor</h1>
+                <p className="text-xs text-muted-foreground">Sistema de Monitoreo Agrícola</p>
               </div>
             </Link>
           </div>
@@ -53,14 +53,14 @@ export default function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navigationItems.map((item) => {
-              const isActive = pathname === item.href
+              const isActive = location.pathname === item.href
               const Icon = item.icon
               return (
-                <Link key={item.name} href={item.href}>
+                <Link key={item.name} to={item.href}>
                   <Button
                     variant={isActive ? "default" : "ghost"}
                     className={`flex items-center space-x-2 ${
-                      isActive ? "bg-green-100 text-green-800 hover:bg-green-200" : "text-gray-600 hover:text-gray-900"
+                      isActive ? "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-100 dark:hover:bg-green-800" : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -84,6 +84,9 @@ export default function Navigation() {
               <Bell className="h-5 w-5" />
               <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
             </Button>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* User Menu */}
             <DropdownMenu>
@@ -125,20 +128,20 @@ export default function Navigation() {
           <div className="md:hidden border-t border-gray-200 py-4">
             <div className="space-y-2">
               {navigationItems.map((item) => {
-                const isActive = pathname === item.href
+                const isActive = location.pathname === item.href
                 const Icon = item.icon
                 return (
-                  <Link key={item.name} href={item.href}>
+                  <Link key={item.name} to={item.href}>
                     <div
                       className={`flex items-center space-x-3 px-3 py-2 rounded-lg ${
-                        isActive ? "bg-green-100 text-green-800" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        isActive ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100" : "text-muted-foreground hover:bg-accent hover:text-foreground"
                       }`}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <Icon className="h-5 w-5" />
                       <div>
                         <div className="font-medium">{item.name}</div>
-                        <div className="text-xs text-gray-500">{item.description}</div>
+                        <div className="text-xs text-muted-foreground">{item.description}</div>
                       </div>
                     </div>
                   </Link>
