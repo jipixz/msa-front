@@ -21,6 +21,7 @@ import { Sun, CloudRain, Thermometer, Droplets, AlertTriangle, CheckCircle, Leaf
 import { MapContainer, TileLayer, Marker, Popup, Circle, SVGOverlay } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { useTimeAgo } from './hooks/useTimeAgo'
 
 // Tipos para los datos de la API
 interface PredictionData {
@@ -114,6 +115,9 @@ const WeatherMap = () => {
   const [error, setError] = useState<string | null>(null)
   const [showWeatherInfo, setShowWeatherInfo] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  
+  // Usar el hook para actualización automática del tiempo
+  const timeAgoText = useTimeAgo(lastUpdate)
   
   // Solo capas de tiles de OpenWeather (eliminamos las simuladas)
   const [activeWeatherTiles, setActiveWeatherTiles] = useState({
@@ -294,20 +298,7 @@ const WeatherMap = () => {
     }
   }
 
-  // Función para formatear tiempo transcurrido
-  const getTimeAgo = (date: Date): string => {
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / (1000 * 60))
-    
-    if (diffMins < 1) return 'Hace menos de 1 minuto'
-    if (diffMins === 1) return 'Hace 1 minuto'
-    if (diffMins < 60) return `Hace ${diffMins} minutos`
-    
-    const diffHours = Math.floor(diffMins / 60)
-    if (diffHours === 1) return 'Hace 1 hora'
-    return `Hace ${diffHours} horas`
-  }
+
 
   return (
     <Card className="mb-6">
@@ -315,10 +306,10 @@ const WeatherMap = () => {
         <CardTitle className="flex items-center gap-2">
           <Map className="h-5 w-5" />
           Mapa Meteorológico - Cerro Blanco 5ta Sección, Tacotalpa
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2 flex-col">
             {lastUpdate && (
               <span className="text-xs text-gray-500">
-                {getTimeAgo(lastUpdate)}
+                {timeAgoText}
               </span>
             )}
             <Button
@@ -336,7 +327,7 @@ const WeatherMap = () => {
       <CardContent>
         {/* Solo controles de capas de tiles globales */}
         <div className="mb-4">
-          <p className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
+          <p className="text-md font-medium mb-3 text-gray-700 dark:text-gray-300 text-left">
             Capas meteorológicas globales:
           </p>
           <div className="flex flex-wrap gap-2">
@@ -421,7 +412,7 @@ const WeatherMap = () => {
                       <p className="text-xs">🌬️ {weatherData.windSpeed} m/s</p>
                       {lastUpdate && (
                         <p className="text-xs text-gray-500">
-                          {getTimeAgo(lastUpdate)}
+                          {timeAgoText}
                         </p>
                       )}
                     </div>
@@ -453,13 +444,13 @@ const WeatherMap = () => {
           {/* Información meteorológica optimizada */}
           {showWeatherInfo && weatherData && (
             <div className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 max-w-xs z-10">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-3 flex-col">
                 <h4 className="font-semibold text-sm text-gray-800 dark:text-gray-200">
                   Condiciones Actuales
                 </h4>
                 {lastUpdate && (
                   <span className="text-xs text-gray-500">
-                    {getTimeAgo(lastUpdate)}
+                    {timeAgoText}
                   </span>
                 )}
               </div>
