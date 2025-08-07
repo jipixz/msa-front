@@ -379,6 +379,7 @@ const WeatherMap = () => {
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              className="grayscale-[0.1] contrast-[1.1]"
             />
 
             {/* Solo capas de tiles meteorológicos de OpenWeather */}
@@ -390,8 +391,9 @@ const WeatherMap = () => {
                   key={`weather-tile-${tileType}`}
                   url={`https://tile.openweathermap.org/map/${config.layer}/{z}/{x}/{y}.png?appid=${OPENWEATHER_API_KEY}`}
                   attribution='Weather data © OpenWeatherMap'
-                  opacity={0.6}
+                  opacity={1}
                   maxZoom={18}
+                  className="saturate-[1.4] contrast-[1.2]"
                 />
               )
             })}
@@ -764,8 +766,8 @@ export default function PredictionsPage() {
         <WeatherMap />
 
         {/* Alerts for Cacao Cultivation */}
-        {alertsData?.alerts && alertsData.alerts.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        {/* {alertsData?.alerts && alertsData.alerts.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-3 mb-6">
             {alertsData.alerts.map((alert, index) => {
               // Determinar la severidad basada en el tipo
               const isWarning = alert.type === 'warning';
@@ -783,8 +785,8 @@ export default function PredictionsPage() {
                     }
                   `}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 mt-0.5">
+                  <div className="flex items-start gap-3 flex-col">
+                    <div className="flex-shrink-0 mt-0.5 mx-auto">
                       {severity === 'warning' ? (
                         <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                       ) : (
@@ -812,7 +814,7 @@ export default function PredictionsPage() {
                       `}>
                         <p className="mb-3">{alert.message}</p>
                         
-                        {/* Mostrar recomendaciones múltiples si existen */}
+                        
                         {(alert.recommendations && alert.recommendations.length > 0) && (
                           <div className="space-y-2">
                             <p className="font-medium text-gray-900 dark:text-gray-100">
@@ -836,7 +838,7 @@ export default function PredictionsPage() {
                           </div>
                         )}
                         
-                        {/* Mostrar recomendación única si existe */}
+                        
                         {alert.recommendation && (
                           <div className="space-y-2">
                             <p className="font-medium text-gray-900 dark:text-gray-100">
@@ -863,7 +865,7 @@ export default function PredictionsPage() {
             })}
           </div>
         )}
-
+ */}
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
           <TabsList className="grid w-full grid-cols-2 h-20 md:h-10 md:grid-cols-4 max-w-2xl">
@@ -874,7 +876,7 @@ export default function PredictionsPage() {
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Gráfico de Temperatura */}
               <Card>
                 <CardHeader>
@@ -948,7 +950,7 @@ export default function PredictionsPage() {
           </TabsContent>
 
           <TabsContent value="climate" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Gráfico de Temperatura detallado */}
               <Card>
                 <CardHeader>
@@ -958,7 +960,7 @@ export default function PredictionsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
+                  <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={temperatureData?.predictions || []}>
                         <XAxis dataKey="day" tickFormatter={formatDayLabel} />
@@ -993,7 +995,7 @@ export default function PredictionsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
+                  <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={rainfallData?.predictions || []}>
                         <XAxis dataKey="day" tickFormatter={formatDayLabel} />
@@ -1017,7 +1019,7 @@ export default function PredictionsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-80">
+                <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={soilMoistureData?.predictions || []}>
                       <XAxis dataKey="day" tickFormatter={formatDayLabel} />
@@ -1045,7 +1047,7 @@ export default function PredictionsPage() {
           </TabsContent>
 
           <TabsContent value="recommendations" className="mt-6">
-            <div className="space-y-4">
+            <div className=" mx-auto space-y-1 grid grid-cols-1 md:grid-cols-3 gap-4">
               {alertsData?.alerts && alertsData.alerts.length > 0 ? (
                 alertsData.alerts.map((alert, index) => {
                   const isWarning = alert.type === 'warning';
@@ -1063,8 +1065,8 @@ export default function PredictionsPage() {
                         }
                       `}
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-0.5">
+                      <div className="flex items-start gap-3 flex-col">
+                        <div className="flex-shrink-0 mt-0.5 mx-auto">
                           {severity === 'warning' ? (
                             <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                           ) : (
