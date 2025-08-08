@@ -6,6 +6,7 @@ import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useAuthStore } from "@/lib/auth-store"
 import { Bell } from "lucide-react"
 
 // URL del servidor backend
@@ -38,6 +39,7 @@ type ChartConfig = {
 }
 
 export function SensorDashboard() {
+  const { user } = useAuthStore()
   const [data, setData] = useState<SensorData[]>([])
   const [currentData, setCurrentData] = useState<SensorData | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -392,7 +394,7 @@ export function SensorDashboard() {
   return (
     <div className="w-full h-full space-y-4 overflow-auto p-4 px-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Panel de Sensores</h2>
+        <h2 className="text-3xl font-bold tracking-tight">{user ? `Hola, ${user.name || user.email}` : 'Panel de Sensores'}</h2>
         <div className="flex items-center space-x-2">
           {isConnected ? (
             <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-sm font-medium text-green-800 dark:bg-green-900 dark:text-green-100">

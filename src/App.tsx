@@ -7,6 +7,11 @@ import { SensorDashboard } from "@/components/sensor-dashboard"
 import Navigation from "@/components/navigation"
 import PredictionsPage from "@/pages/predictions/predictions"
 import ProductionPage from "@/pages/production/production"
+import LoginPage from "@/pages/login"
+import AdminPage from "@/pages/admin/index"
+import ForgotPasswordPage from "@/pages/auth/forgot"
+import ResetPasswordPage from "@/pages/auth/reset"
+import { RequireAdmin, RequireAuth, PublicOnly } from "@/components/RequireAuth"
 
 function App() {
   useEffect(() => {
@@ -19,9 +24,13 @@ function App() {
         <Layout>
           <Navigation />
           <Routes>
-            <Route path="/" element={<SensorDashboard />} />
-            <Route path="/predictions" element={<PredictionsPage />} />
-            <Route path="/production" element={<ProductionPage />} />
+            <Route path="/login" element={<PublicOnly><LoginPage /></PublicOnly>} />
+            <Route path="/reset" element={<PublicOnly><ResetPasswordPage /></PublicOnly>} />
+            <Route path="/forgot" element={<PublicOnly><ForgotPasswordPage /></PublicOnly>} />
+            <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
+            <Route path="/" element={<RequireAuth><SensorDashboard /></RequireAuth>} />
+            <Route path="/predictions" element={<RequireAuth><PredictionsPage /></RequireAuth>} />
+            <Route path="/production" element={<RequireAuth><ProductionPage /></RequireAuth>} />
           </Routes>
         </Layout>
       </Router>
