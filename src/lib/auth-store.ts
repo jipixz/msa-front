@@ -5,6 +5,7 @@ type User = {
   email: string
   name?: string
   role: "admin" | "user"
+  avatarUrl?: string
 }
 
 type AuthState = {

@@ -7,7 +7,7 @@ interface AlertsSectionProps {
   alertsData: AlertsData | null
 }
 
-export const AlertsSection: React.FC<AlertsSectionProps> = ({ alertsData }) => {
+export const AlertsSection: React.FC<AlertsSectionProps> = ({alertsData}) => {
   if (!alertsData?.alerts || alertsData.alerts.length === 0) {
     return null
   }

@@ -125,8 +125,12 @@ export default function Navigation() {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <User className="h-5 w-5" />
+                <Button variant="ghost" size="sm" className="p-0 rounded-full w-8 h-8 overflow-hidden">
+                  {user?.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="avatar" className="w-8 h-8 object-cover" />
+                  ) : (
+                    <User className="h-5 w-5" />
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
