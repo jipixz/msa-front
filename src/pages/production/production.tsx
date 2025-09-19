@@ -50,6 +50,11 @@ import {
   Droplets,
   Clock,
   FileText,
+  Image,
+  Eye,
+  X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 
 // Tipos para los datos de producción
@@ -59,15 +64,16 @@ interface ProductionRecord {
   parcela: 'Parcela Norte' | 'Parcela Sur'
   variedad_cacao: 'Criollo' | 'Forastero' | 'Trinitario' | 'Nacional'
   cantidad_kg: number
-  calidad: 'Premium' | 'Estándar' | 'Baja'
+  calidad: 'Premium' | 'Estándar' | 'Baja' | 'Orgánico'
   humedad_porcentaje: number
   precio_kg: number
-  metodo_secado: 'Natural' | 'Secador solar' | 'Secador mecánico'
+  metodo_secado: 'Natural' | 'Secador solar' | 'Secador mecánico' | 'Secado al sol'
   tiempo_secado_horas?: number
   temperatura_secado?: number
   humedad_final?: number
   observaciones?: string
   fecha_registro: string
+  imagenes?: string[] // Array de imágenes en base64
 }
 
 interface ProductionStats {
@@ -101,23 +107,32 @@ export default function ProductionPage() {
   const [ordenarPor, setOrdenarPor] = useState<string>("fecha_cosecha")
   const [ordenDescendente, setOrdenDescendente] = useState<boolean>(true)
 
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(50)
+
+  // Estados para imágenes
+  const [selectedImages, setSelectedImages] = useState<string[]>([])
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
+
   // Estados para los datos
   const [productionRecords, setProductionRecords] = useState<ProductionRecord[]>([])
   const [stats, setStats] = useState<ProductionStats | null>(null)
 
   // Estados para el formulario
   const [formData, setFormData] = useState({
-    fecha_cosecha: "",
+    fecha_cosecha: new Date().toISOString().split('T')[0], // Fecha actual por defecto
     parcela: "Parcela Norte" as 'Parcela Norte' | 'Parcela Sur',
-    variedad_cacao: "Criollo" as 'Criollo' | 'Forastero' | 'Trinitario' | 'Nacional',
+    variedad_cacao: "Trinitario" as 'Criollo' | 'Forastero' | 'Trinitario' | 'Nacional',
     cantidad_kg: "",
-    calidad: "Estándar" as const,
+    calidad: "Orgánico" as const,
     humedad_porcentaje: "",
     precio_kg: "",
-    metodo_secado: "Natural" as const,
+    metodo_secado: "Secado al sol" as const,
     tiempo_secado_horas: "",
     temperatura_secado: "",
     humedad_final: "",
+    peso_final: "",
     observaciones: "",
   })
 
@@ -153,18 +168,67 @@ export default function ProductionPage() {
     }
   }
 
+  // Función para manejar selección de imágenes
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    
+    if (files.length + selectedImages.length > 5) {
+      setError("Máximo 5 imágenes permitidas")
+      return
+    }
+
+    files.forEach(file => {
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        setError("Cada imagen debe ser menor a 5MB")
+        return
+      }
+
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        setSelectedImages(prev => [...prev, result])
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  // Función para eliminar imagen
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index))
+  }
+
+  // Función para previsualizar imagen
+  const handlePreviewImage = (image: string) => {
+    setPreviewImage(image)
+  }
+
+  // Función para descargar imagen
+  const downloadImage = (image: string, index: number) => {
+    const link = document.createElement('a')
+    link.href = image
+    link.download = `imagen_cacao_${index + 1}.jpg`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   // Función para crear nuevo registro
   const createProductionRecord = async () => {
     try {
       setSubmitting(true)
       setError(null)
       
+      const dataToSend = {
+        ...formData,
+        imagenes: selectedImages
+      }
+      
       const response = await fetch(`${API_BASE_URL}/api/production`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
       })
 
       if (!response.ok) {
@@ -178,22 +242,23 @@ export default function ProductionPage() {
       // Recargar estadísticas
       await loadStats()
       
-             // Limpiar formulario y mostrar éxito
-       setFormData({
-         fecha_cosecha: "",
-         parcela: "Parcela Norte" as 'Parcela Norte' | 'Parcela Sur',
-         variedad_cacao: "Criollo" as 'Criollo' | 'Forastero' | 'Trinitario' | 'Nacional',
-         cantidad_kg: "",
-         calidad: "Estándar",
-         humedad_porcentaje: "",
-         precio_kg: "",
-         metodo_secado: "Natural",
-         tiempo_secado_horas: "",
-         temperatura_secado: "",
-         humedad_final: "",
-         observaciones: "",
-       })
+      // Limpiar formulario y mostrar éxito
+      setFormData({
+        fecha_cosecha: new Date().toISOString().split('T')[0], // Fecha actual
+        parcela: "Parcela Norte" as 'Parcela Norte' | 'Parcela Sur',
+        variedad_cacao: "Criollo" as 'Criollo' | 'Forastero' | 'Trinitario' | 'Nacional',
+        cantidad_kg: "",
+        calidad: "Estándar",
+        humedad_porcentaje: "",
+        precio_kg: "",
+        metodo_secado: "Natural",
+        tiempo_secado_horas: "",
+        temperatura_secado: "",
+        humedad_final: "",
+        observaciones: "",
+      })
       
+      setSelectedImages([])
       setSuccess("Registro de producción creado exitosamente")
       setIsAddDialogOpen(false)
       
@@ -228,6 +293,37 @@ export default function ProductionPage() {
       style: 'currency',
       currency: 'COP'
     }).format(amount)
+  }
+
+  // Función para obtener datos del mes actual
+  const getCurrentMonthData = () => {
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+    
+    return productionRecords.filter(record => {
+      const recordDate = new Date(record.fecha_cosecha)
+      return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear
+    })
+  }
+
+  // Función para calcular estadísticas de datos filtrados
+  const getFilteredStats = () => {
+    const filtered = registrosFiltradosYOrdenados
+    const totalProduccion = filtered.reduce((sum, record) => sum + record.cantidad_kg, 0)
+    const totalIngresos = filtered.reduce((sum, record) => sum + (record.cantidad_kg * record.precio_kg), 0)
+    const precioPromedio = filtered.length > 0 ? totalIngresos / totalProduccion : 0
+    const porcentajePremium = filtered.length > 0 
+      ? (filtered.filter(r => r.calidad === 'Premium').length / filtered.length) * 100 
+      : 0
+
+    return {
+      total_produccion: totalProduccion,
+      total_ingresos: totalIngresos,
+      precio_promedio: precioPromedio,
+      porcentaje_premium: porcentajePremium,
+      total_registros: filtered.length
+    }
   }
 
   // Colores para las gráficas
@@ -283,6 +379,33 @@ export default function ProductionPage() {
 
     return registros
   }, [productionRecords, filtroParcela, filtroVariedad, filtroCalidad, ordenarPor, ordenDescendente])
+
+  // Función para obtener registros paginados
+  const getPaginatedRecords = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return registrosFiltradosYOrdenados.slice(startIndex, endIndex)
+  }
+
+  // Calcular total de páginas
+  const totalPages = Math.ceil(registrosFiltradosYOrdenados.length / itemsPerPage)
+
+  // Obtener datos del mes actual
+  const currentMonthData = getCurrentMonthData()
+  const currentMonthStats = {
+    total_produccion: currentMonthData.reduce((sum, record) => sum + record.cantidad_kg, 0),
+    total_ingresos: currentMonthData.reduce((sum, record) => sum + (record.cantidad_kg * record.precio_kg), 0),
+    precio_promedio: currentMonthData.length > 0 
+      ? currentMonthData.reduce((sum, record) => sum + (record.cantidad_kg * record.precio_kg), 0) / currentMonthData.reduce((sum, record) => sum + record.cantidad_kg, 0)
+      : 0,
+    porcentaje_premium: currentMonthData.length > 0 
+      ? (currentMonthData.filter(r => r.calidad === 'Premium').length / currentMonthData.length) * 100 
+      : 0,
+    total_registros: currentMonthData.length
+  }
+
+  // Obtener estadísticas de datos filtrados
+  const filteredStats = getFilteredStats()
 
   // Función para cambiar ordenamiento
   const cambiarOrdenamiento = (campo: string) => {
@@ -400,11 +523,12 @@ export default function ProductionPage() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Premium">Premium</SelectItem>
-                      <SelectItem value="Estándar">Estándar</SelectItem>
-                      <SelectItem value="Baja">Baja</SelectItem>
-                    </SelectContent>
+                      <SelectContent>
+                        <SelectItem value="Premium">Premium</SelectItem>
+                        <SelectItem value="Estándar">Estándar</SelectItem>
+                        <SelectItem value="Baja">Baja</SelectItem>
+                        <SelectItem value="Orgánico">Orgánico</SelectItem>
+                      </SelectContent>
                   </Select>
                 </div>
 
@@ -445,6 +569,7 @@ export default function ProductionPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Natural">Natural</SelectItem>
+                      <SelectItem value="Secado al sol">Secado al sol</SelectItem>
                       <SelectItem value="Secador solar">Secador solar</SelectItem>
                       <SelectItem value="Secador mecánico">Secador mecánico</SelectItem>
                     </SelectContent>
@@ -489,6 +614,19 @@ export default function ProductionPage() {
                     onChange={(e) => setFormData(prev => ({ ...prev, humedad_final: e.target.value }))}
                   />
                 </div>
+
+                {/* Peso final */}
+                <div className="space-y-2">
+                  <Label htmlFor="humedad_final">Peso Final (kg)</Label>
+                  <Input
+                    id="peso_final"
+                    type="number"
+                    step="0.1"
+                    placeholder="Opcional"
+                    value={formData.peso_final}
+                    onChange={(e) => setFormData(prev => ({ ...prev, humedad_final: e.target.value }))}
+                  />
+                </div>
               </div>
 
               {/* Observaciones */}
@@ -501,6 +639,53 @@ export default function ProductionPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, observaciones: e.target.value }))}
                   rows={3}
                 />
+              </div>
+
+              {/* Campo de imágenes */}
+              <div className="space-y-2">
+                <Label htmlFor="imagenes">Imágenes (máximo 5, 5MB cada una)</Label>
+                <Input
+                  id="imagenes"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageSelect}
+                  className="cursor-pointer"
+                />
+                
+                {/* Mostrar imágenes seleccionadas */}
+                {selectedImages.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                    {selectedImages.map((image, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={image}
+                          alt={`Imagen ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border"
+                        />
+                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handlePreviewImage(image)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => removeImage(index)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Imagen {index + 1}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end space-x-2 pt-4">
@@ -534,66 +719,64 @@ export default function ProductionPage() {
           </Alert>
         )}
 
-        {/* Cards de estadísticas */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <Card className="border-l-4 border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Producción Total</p>
-                    <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                      {stats.total_produccion.toFixed(1)} kg
-                    </p>
-                  </div>
-                  <Weight className="h-8 w-8 text-blue-500" />
+        {/* Cards de estadísticas del mes actual */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Card className="border-l-4 border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Producción del Mes</p>
+                  <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                    {currentMonthStats.total_produccion.toFixed(1)} kg
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <Weight className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="border-l-4 border-l-green-500 bg-green-50/50 dark:bg-green-950/50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-green-800 dark:text-green-200">Ingresos Totales</p>
-                    <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-                      {formatCurrency(stats.total_ingresos)}
-                    </p>
-                  </div>
-                  <DollarSign className="h-8 w-8 text-green-500" />
+          <Card className="border-l-4 border-l-green-500 bg-green-50/50 dark:bg-green-950/50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-green-800 dark:text-green-200">Ingresos del Mes</p>
+                  <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                    {formatCurrency(currentMonthStats.total_ingresos)}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <DollarSign className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="border-l-4 border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-orange-800 dark:text-orange-200">Precio Promedio</p>
-                    <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
-                      {formatCurrency(stats.precio_promedio)}
-                    </p>
-                  </div>
-                  <TrendingUp className="h-8 w-8 text-orange-500" />
+          <Card className="border-l-4 border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-orange-800 dark:text-orange-200">Precio Promedio</p>
+                  <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                    {formatCurrency(currentMonthStats.precio_promedio)}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <TrendingUp className="h-8 w-8 text-orange-500" />
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="border-l-4 border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-purple-800 dark:text-purple-200">Calidad Premium</p>
-                    <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                      {stats.porcentaje_premium.toFixed(1)}%
-                    </p>
-                  </div>
-                  <Package className="h-8 w-8 text-purple-500" />
+          <Card className="border-l-4 border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-purple-800 dark:text-purple-200">Cacao Orgánico</p>
+                  <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                    {currentMonthData.filter(r => r.calidad === 'Orgánico').reduce((sum, r) => sum + r.cantidad_kg, 0).toFixed(1)} kg
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+                <Package className="h-8 w-8 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
@@ -645,6 +828,7 @@ export default function ProductionPage() {
                             { name: 'Premium', value: productionRecords.filter(r => r.calidad === 'Premium').length },
                             { name: 'Estándar', value: productionRecords.filter(r => r.calidad === 'Estándar').length },
                             { name: 'Baja', value: productionRecords.filter(r => r.calidad === 'Baja').length },
+                            { name: 'Orgánico', value: productionRecords.filter(r => r.calidad === 'Orgánico').length },
                           ]}
                           cx="50%"
                           cy="50%"
@@ -674,6 +858,65 @@ export default function ProductionPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {/* Cards de estadísticas filtradas */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <Card className="border-l-4 border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Registros Filtrados</p>
+                          <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                            {filteredStats.total_registros}
+                          </p>
+                        </div>
+                        <FileText className="h-8 w-8 text-blue-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-l-4 border-l-green-500 bg-green-50/50 dark:bg-green-950/50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-green-800 dark:text-green-200">Producción Filtrada</p>
+                          <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                            {filteredStats.total_produccion.toFixed(1)} kg
+                          </p>
+                        </div>
+                        <Weight className="h-8 w-8 text-green-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-l-4 border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-orange-800 dark:text-orange-200">Ingresos Filtrados</p>
+                          <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                            {formatCurrency(filteredStats.total_ingresos)}
+                          </p>
+                        </div>
+                        <DollarSign className="h-8 w-8 text-orange-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-l-4 border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-purple-800 dark:text-purple-200">Orgánico Filtrado</p>
+                          <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                            {registrosFiltradosYOrdenados.filter(r => r.calidad === 'Orgánico').reduce((sum, r) => sum + r.cantidad_kg, 0).toFixed(1)} kg
+                          </p>
+                        </div>
+                        <Package className="h-8 w-8 text-purple-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
                 {/* Filtros */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div>
@@ -717,6 +960,7 @@ export default function ProductionPage() {
                         <SelectItem value="Premium">Premium</SelectItem>
                         <SelectItem value="Estándar">Estándar</SelectItem>
                         <SelectItem value="Baja">Baja</SelectItem>
+                        <SelectItem value="Orgánico">Orgánico</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -734,6 +978,49 @@ export default function ProductionPage() {
                         <SelectItem value="humedad_porcentaje">Humedad (%)</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                </div>
+
+                {/* Controles de paginación */}
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="items-per-page">Elementos por página:</Label>
+                    <Select value={itemsPerPage.toString()} onValueChange={(value) => {
+                      setItemsPerPage(Number(value))
+                      setCurrentPage(1)
+                    }}>
+                      <SelectTrigger className="w-20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="50">50</SelectItem>
+                        <SelectItem value="100">100</SelectItem>
+                        <SelectItem value="200">200</SelectItem>
+                        <SelectItem value="500">500</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm">
+                      Página {currentPage} de {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
 
@@ -770,10 +1057,11 @@ export default function ProductionPage() {
                         </TableHead>
                         <TableHead>Método Secado</TableHead>
                         <TableHead>Total</TableHead>
+                        <TableHead>Imágenes</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {registrosFiltradosYOrdenados.map((record) => (
+                      {getPaginatedRecords().map((record) => (
                         <TableRow key={record._id}>
                           <TableCell>{formatDate(record.fecha_cosecha)}</TableCell>
                           <TableCell>{record.parcela}</TableCell>
@@ -781,7 +1069,13 @@ export default function ProductionPage() {
                           <TableCell>{record.cantidad_kg.toFixed(1)}</TableCell>
                           <TableCell>
                             <Badge 
-                              variant={record.calidad === 'Premium' ? 'default' : record.calidad === 'Estándar' ? 'secondary' : 'destructive'}
+                              variant={
+                                record.calidad === 'Premium' ? 'default' : 
+                                record.calidad === 'Estándar' ? 'secondary' : 
+                                record.calidad === 'Orgánico' ? 'default' : 
+                                'destructive'
+                              }
+                              className={record.calidad === 'Orgánico' ? 'bg-green-100 text-green-800 border-green-200' : ''}
                             >
                               {record.calidad}
                             </Badge>
@@ -791,6 +1085,35 @@ export default function ProductionPage() {
                           <TableCell>{record.metodo_secado}</TableCell>
                           <TableCell className="font-semibold">
                             {formatCurrency(record.cantidad_kg * record.precio_kg)}
+                          </TableCell>
+                          <TableCell>
+                            {record.imagenes && record.imagenes.length > 0 ? (
+                              <div className="flex gap-1">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handlePreviewImage(record.imagenes[0])}
+                                  className="h-8 w-8 p-0"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => downloadImage(record.imagenes[0], 0)}
+                                  className="h-8 w-8 p-0"
+                                >
+                                  <Download className="h-4 w-4" />
+                                </Button>
+                                {record.imagenes.length > 1 && (
+                                  <span className="text-xs text-gray-500 ml-1">
+                                    +{record.imagenes.length - 1}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-gray-400 text-sm">Sin imágenes</span>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -868,6 +1191,7 @@ export default function ProductionPage() {
                             { name: 'Natural', value: productionRecords.filter(r => r.metodo_secado === 'Natural').length },
                             { name: 'Secador solar', value: productionRecords.filter(r => r.metodo_secado === 'Secador solar').length },
                             { name: 'Secador mecánico', value: productionRecords.filter(r => r.metodo_secado === 'Secador mecánico').length },
+                            { name: 'Secado al sol', value: productionRecords.filter(r => r.metodo_secado === 'Secado al sol').length },
                           ]}
                           cx="50%"
                           cy="50%"
@@ -912,6 +1236,43 @@ export default function ProductionPage() {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Modal de previsualización de imágenes */}
+        {previewImage && (
+          <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
+            <DialogContent className="max-w-4xl max-h-[90vh]">
+              <DialogHeader>
+                <DialogTitle>Previsualización de Imagen</DialogTitle>
+              </DialogHeader>
+              <div className="flex justify-center">
+                <img
+                  src={previewImage}
+                  alt="Previsualización"
+                  className="max-w-full max-h-[70vh] object-contain rounded-lg"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const link = document.createElement('a')
+                    link.href = previewImage
+                    link.download = 'imagen_cacao.jpg'
+                    document.body.appendChild(link)
+                    link.click()
+                    document.body.removeChild(link)
+                  }}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Descargar
+                </Button>
+                <Button onClick={() => setPreviewImage(null)}>
+                  Cerrar
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </div>
   )
