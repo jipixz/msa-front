@@ -33,24 +33,15 @@ import {
 } from "recharts"
 import {
   Plus,
-  Filter,
   Download,
-  MapPin,
   Package,
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Weight,
-  Search,
   Loader2,
   AlertTriangle,
   CheckCircle,
-  Calendar,
-  Thermometer,
-  Droplets,
-  Clock,
   FileText,
-  Image,
   Eye,
   X,
   ChevronLeft,
@@ -71,6 +62,7 @@ interface ProductionRecord {
   tiempo_secado_horas?: number
   temperatura_secado?: number
   humedad_final?: number
+  peso_final?: number
   observaciones?: string
   fecha_registro: string
   imagenes?: string[] // Array de imágenes en base64
@@ -114,6 +106,8 @@ export default function ProductionPage() {
   // Estados para imágenes
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [previewImages, setPreviewImages] = useState<string[]>([])
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   // Estados para los datos
   const [productionRecords, setProductionRecords] = useState<ProductionRecord[]>([])
@@ -202,6 +196,13 @@ export default function ProductionPage() {
     setPreviewImage(image)
   }
 
+  // Función para previsualizar múltiples imágenes
+  const handlePreviewImages = (images: string[], startIndex: number = 0) => {
+    setPreviewImages(images)
+    setCurrentImageIndex(startIndex)
+    setPreviewImage(images[startIndex])
+  }
+
   // Función para descargar imagen
   const downloadImage = (image: string, index: number) => {
     const link = document.createElement('a')
@@ -210,6 +211,24 @@ export default function ProductionPage() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  // Función para navegar a la siguiente imagen
+  const nextImage = () => {
+    if (previewImages.length > 0) {
+      const nextIndex = (currentImageIndex + 1) % previewImages.length
+      setCurrentImageIndex(nextIndex)
+      setPreviewImage(previewImages[nextIndex])
+    }
+  }
+
+  // Función para navegar a la imagen anterior
+  const prevImage = () => {
+    if (previewImages.length > 0) {
+      const prevIndex = currentImageIndex === 0 ? previewImages.length - 1 : currentImageIndex - 1
+      setCurrentImageIndex(prevIndex)
+      setPreviewImage(previewImages[prevIndex])
+    }
   }
 
   // Función para crear nuevo registro
@@ -248,13 +267,14 @@ export default function ProductionPage() {
         parcela: "Parcela Norte" as 'Parcela Norte' | 'Parcela Sur',
         variedad_cacao: "Criollo" as 'Criollo' | 'Forastero' | 'Trinitario' | 'Nacional',
         cantidad_kg: "",
-        calidad: "Estándar",
+        calidad: "Orgánico",
         humedad_porcentaje: "",
         precio_kg: "",
-        metodo_secado: "Natural",
+        metodo_secado: "Secado al sol",
         tiempo_secado_horas: "",
         temperatura_secado: "",
         humedad_final: "",
+        peso_final: "",
         observaciones: "",
       })
       
@@ -615,18 +635,18 @@ export default function ProductionPage() {
                   />
                 </div>
 
-                {/* Peso final */}
-                <div className="space-y-2">
-                  <Label htmlFor="humedad_final">Peso Final (kg)</Label>
-                  <Input
-                    id="peso_final"
-                    type="number"
-                    step="0.1"
-                    placeholder="Opcional"
-                    value={formData.peso_final}
-                    onChange={(e) => setFormData(prev => ({ ...prev, humedad_final: e.target.value }))}
-                  />
-                </div>
+                 {/* Peso final */}
+                 <div className="space-y-2">
+                   <Label htmlFor="peso_final">Peso Final (kg)</Label>
+                   <Input
+                     id="peso_final"
+                     type="number"
+                     step="0.1"
+                     placeholder="Opcional"
+                     value={formData.peso_final}
+                     onChange={(e) => setFormData(prev => ({ ...prev, peso_final: e.target.value }))}
+                   />
+                 </div>
               </div>
 
               {/* Observaciones */}
@@ -1092,7 +1112,7 @@ export default function ProductionPage() {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => handlePreviewImage(record.imagenes[0])}
+                                  onClick={() => handlePreviewImages(record.imagenes || [], 0)}
                                   className="h-8 w-8 p-0"
                                 >
                                   <Eye className="h-4 w-4" />
@@ -1100,7 +1120,7 @@ export default function ProductionPage() {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => downloadImage(record.imagenes[0], 0)}
+                                  onClick={() => downloadImage(record.imagenes?.[0] || '', 0)}
                                   className="h-8 w-8 p-0"
                                 >
                                   <Download className="h-4 w-4" />
@@ -1239,34 +1259,124 @@ export default function ProductionPage() {
 
         {/* Modal de previsualización de imágenes */}
         {previewImage && (
-          <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
-            <DialogContent className="max-w-4xl max-h-[90vh]">
+          <Dialog open={!!previewImage} onOpenChange={() => {
+            setPreviewImage(null)
+            setPreviewImages([])
+            setCurrentImageIndex(0)
+          }}>
+            <DialogContent className="max-w-6xl max-h-[90vh]">
               <DialogHeader>
-                <DialogTitle>Previsualización de Imagen</DialogTitle>
+                <DialogTitle>
+                  Galería de Imágenes 
+                  {previewImages.length > 1 && (
+                    <span className="text-sm font-normal text-gray-500 ml-2">
+                      ({currentImageIndex + 1} de {previewImages.length})
+                    </span>
+                  )}
+                </DialogTitle>
               </DialogHeader>
-              <div className="flex justify-center">
-                <img
-                  src={previewImage}
-                  alt="Previsualización"
-                  className="max-w-full max-h-[70vh] object-contain rounded-lg"
-                />
+              
+              <div className="relative">
+                {/* Imagen principal */}
+                <div className="flex justify-center mb-4">
+                  <img
+                    src={previewImage}
+                    alt={`Imagen ${currentImageIndex + 1}`}
+                    className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-lg"
+                  />
+                </div>
+
+                {/* Controles de navegación */}
+                {previewImages.length > 1 && (
+                  <div className="flex justify-center gap-4 mb-4">
+                    <Button
+                      variant="outline"
+                      onClick={prevImage}
+                      className="flex items-center gap-2"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Anterior
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={nextImage}
+                      className="flex items-center gap-2"
+                    >
+                      Siguiente
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* Miniaturas */}
+                {previewImages.length > 1 && (
+                  <div className="flex justify-center gap-2 mb-4 overflow-x-auto">
+                    {previewImages.map((image, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setCurrentImageIndex(index)
+                          setPreviewImage(image)
+                        }}
+                        className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden ${
+                          index === currentImageIndex 
+                            ? 'border-blue-500 ring-2 ring-blue-200' 
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <img
+                          src={image}
+                          alt={`Miniatura ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    const link = document.createElement('a')
-                    link.href = previewImage
-                    link.download = 'imagen_cacao.jpg'
-                    document.body.appendChild(link)
-                    link.click()
-                    document.body.removeChild(link)
-                  }}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Descargar
-                </Button>
-                <Button onClick={() => setPreviewImage(null)}>
+
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const link = document.createElement('a')
+                      link.href = previewImage
+                      link.download = `imagen_cacao_${currentImageIndex + 1}.jpg`
+                      document.body.appendChild(link)
+                      link.click()
+                      document.body.removeChild(link)
+                    }}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Descargar
+                  </Button>
+                  {previewImages.length > 1 && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        previewImages.forEach((image, index) => {
+                          setTimeout(() => {
+                            const link = document.createElement('a')
+                            link.href = image
+                            link.download = `imagen_cacao_${index + 1}.jpg`
+                            document.body.appendChild(link)
+                            link.click()
+                            document.body.removeChild(link)
+                          }, index * 100)
+                        })
+                      }}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Descargar Todas
+                    </Button>
+                  )}
+                </div>
+                <Button onClick={() => {
+                  setPreviewImage(null)
+                  setPreviewImages([])
+                  setCurrentImageIndex(0)
+                }}>
                   Cerrar
                 </Button>
               </div>
