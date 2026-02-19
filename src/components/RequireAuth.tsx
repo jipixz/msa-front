@@ -1,8 +1,8 @@
-import { useEffect } from "react"
+import { useEffect, ReactNode } from "react"
 import { useLocation, Navigate } from "react-router-dom"
 import { useAuthStore } from "@/lib/auth-store"
 
-export function RequireAuth({ children }: { children: JSX.Element }) {
+export function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading, initialize, initialized } = useAuthStore()
   const location = useLocation()
 
@@ -15,7 +15,7 @@ export function RequireAuth({ children }: { children: JSX.Element }) {
   return children
 }
 
-export function RequireAdmin({ children }: { children: JSX.Element }) {
+export function RequireAdmin({ children }: { children: ReactNode }) {
   const { user, loading, initialize, initialized } = useAuthStore()
   const location = useLocation()
 
@@ -29,7 +29,7 @@ export function RequireAdmin({ children }: { children: JSX.Element }) {
   return children
 }
 
-export function PublicOnly({ children }: { children: JSX.Element }) {
+export function PublicOnly({ children }: { children: ReactNode }) {
   const { user, loading, initialize, initialized } = useAuthStore()
   useEffect(() => {
     if (!initialized) initialize()

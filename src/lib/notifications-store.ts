@@ -12,7 +12,7 @@ type NotificationsState = {
 
 let socket: Socket | null = null
 
-export const useNotificationsStore = create<NotificationsState>((set, get) => ({
+export const useNotificationsStore = create<NotificationsState>((set) => ({
   notifications: [],
   unreadCount: 0,
   markAllRead: () => set((state) => ({

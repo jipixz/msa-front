@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -18,7 +17,7 @@ import {
   ReferenceLine,
 } from "recharts"
 import { Sun, CloudRain, Thermometer, Droplets, AlertTriangle, CheckCircle, Leaf, Loader2, Map, Eye, EyeOff, RefreshCw } from "lucide-react"
-import { MapContainer, TileLayer, Marker, Popup, Circle, SVGOverlay } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useTimeAgo } from './hooks/useTimeAgo'
@@ -75,17 +74,6 @@ interface WeatherData {
   windSpeed: number
   description: string
   icon: string
-}
-
-// Interfaz para datos de puntos del grid
-interface GridPoint {
-  lat: number
-  lng: number
-  temperature: number
-  humidity: number
-  precipitation: number
-  cloudiness: number
-  windSpeed: number
 }
 
 // Función para formatear etiquetas de días

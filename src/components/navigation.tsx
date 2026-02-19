@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Home, TrendingUp, Database, Settings, User, Bell, Menu, X, Leaf, BarChart3, MapPin, LogOut, Lock, Shield } from "lucide-react"
+import { Home, TrendingUp, Database, User, Bell, Menu, X, Leaf, LogOut, Lock, Shield } from "lucide-react"
 import { useAuthStore } from "@/lib/auth-store"
 import { useNotificationsStore, initNotifications } from "@/lib/notifications-store"
 import { API_URL } from "@/lib/api"
@@ -35,7 +35,7 @@ const navigationItems = [
 export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const location = useLocation()
-  const { user, logout, initialize, initialized, loading } = useAuthStore()
+  const { user, logout, initialize, initialized } = useAuthStore()
   const { notifications, unreadCount, markAllRead, clearAll } = useNotificationsStore()
 
   useEffect(() => { if (!initialized) initialize() }, [initialized])
