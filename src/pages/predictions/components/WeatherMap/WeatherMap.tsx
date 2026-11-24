@@ -34,31 +34,31 @@ export const WeatherMap: React.FC = () => {
     temperatureTile: { 
       name: 'Temperatura', 
       layer: 'temp_new', 
-      color: 'bg-orange-500', 
+      color: 'bg-warn', 
       icon: Thermometer 
     },
     precipitationTile: { 
       name: 'Precipitación', 
       layer: 'precipitation_new', 
-      color: 'bg-blue-600', 
+      color: 'bg-info', 
       icon: CloudRain 
     },
     cloudsTile: { 
       name: 'Nubes', 
       layer: 'clouds_new', 
-      color: 'bg-gray-400', 
+      color: 'bg-muted', 
       icon: Sun 
     },
     windTile: { 
       name: 'Viento', 
       layer: 'wind_new', 
-      color: 'bg-emerald-500', 
+      color: 'bg-ok', 
       icon: Leaf 
     },
     pressureTile: { 
       name: 'Presión', 
       layer: 'pressure_new', 
-      color: 'bg-purple-500', 
+      color: 'bg-chart-4', 
       icon: Thermometer 
     }
   }
@@ -71,7 +71,7 @@ export const WeatherMap: React.FC = () => {
           Mapa Meteorológico - Cerro Blanco 5ta Sección, Tacotalpa
           <div className="ml-auto flex items-center gap-2">
             {lastUpdate && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted-foreground">
                 {getTimeAgo(lastUpdate)}
               </span>
             )}
@@ -90,7 +90,7 @@ export const WeatherMap: React.FC = () => {
       <CardContent>
         {/* Controles de capas */}
         <div className="mb-4">
-          <p className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
+          <p className="text-sm font-medium mb-3 text-foreground">
             Capas meteorológicas globales:
           </p>
           <div className="flex flex-wrap gap-2">
@@ -105,8 +105,8 @@ export const WeatherMap: React.FC = () => {
                   onClick={() => toggleWeatherTile(key as keyof typeof activeWeatherTiles)}
                   className={`flex items-center gap-2 ${
                     isActive 
-                      ? `${config.color} text-white hover:opacity-90` 
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? `${config.color} text-background hover:opacity-90` 
+                      : 'hover:bg-accent '
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -132,7 +132,7 @@ export const WeatherMap: React.FC = () => {
         </div>
 
         {/* Mapa */}
-        <div className="h-96 w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 relative">
+        <div className="h-96 w-full rounded-lg overflow-hidden border border-border relative">
           <MapContainer
             center={[CERRO_BLANCO_COORDS.lat, CERRO_BLANCO_COORDS.lng]}
             zoom={12}
@@ -166,7 +166,7 @@ export const WeatherMap: React.FC = () => {
               <Popup>
                 <div className="text-center">
                   <h3 className="font-semibold text-sm mb-2">Cerro Blanco 5ta Sección</h3>
-                  <p className="text-xs text-gray-600 mb-2">Tacotalpa, Tabasco</p>
+                  <p className="text-xs text-foreground mb-2">Tacotalpa, Tabasco</p>
                   {weatherData && (
                     <div className="space-y-1">
                       <p className="text-sm font-medium">{weatherData.description}</p>
@@ -174,7 +174,7 @@ export const WeatherMap: React.FC = () => {
                       <p className="text-xs">💧 {weatherData.humidity}%</p>
                       <p className="text-xs">🌬️ {weatherData.windSpeed} m/s</p>
                       {lastUpdate && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-muted-foreground">
                           {getTimeAgo(lastUpdate)}
                         </p>
                       )}
@@ -188,8 +188,8 @@ export const WeatherMap: React.FC = () => {
               center={[CERRO_BLANCO_COORDS.lat, CERRO_BLANCO_COORDS.lng]}
               radius={3000}
               pathOptions={{
-                color: '#10b981',
-                fillColor: '#10b981',
+                color: 'hsl(var(--ok))',
+                fillColor: 'hsl(var(--ok))',
                 fillOpacity: 0.1,
                 weight: 2,
                 dashArray: '5, 5'
@@ -198,7 +198,7 @@ export const WeatherMap: React.FC = () => {
               <Popup>
                 <div className="text-center">
                   <p className="text-sm font-medium">Área de monitoreo</p>
-                  <p className="text-xs text-gray-600">Radio de 3 kilómetros</p>
+                  <p className="text-xs text-foreground">Radio de 3 kilómetros</p>
                 </div>
               </Popup>
             </Circle>
@@ -206,40 +206,40 @@ export const WeatherMap: React.FC = () => {
 
           {/* Información meteorológica */}
           {showWeatherInfo && weatherData && (
-            <div className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 max-w-xs z-10">
+            <div className="absolute top-4 right-4 bg-card text-card-foreground border border-border rounded-lg shadow-lg p-4 max-w-xs z-[1000]">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="font-semibold text-sm text-gray-800 dark:text-gray-200">
+                <h4 className="font-semibold text-sm text-foreground">
                   Condiciones Actuales
                 </h4>
                 {lastUpdate && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     {getTimeAgo(lastUpdate)}
                   </span>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="flex items-center gap-2">
-                  <Thermometer className="h-4 w-4 text-red-500" />
-                  <span className="text-gray-700 dark:text-gray-300">{weatherData.temperature}°C</span>
+                  <Thermometer className="h-4 w-4 text-bad" />
+                  <span className="text-foreground">{weatherData.temperature}°C</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Droplets className="h-4 w-4 text-blue-500" />
-                  <span className="text-gray-700 dark:text-gray-300">{weatherData.humidity}%</span>
+                  <Droplets className="h-4 w-4 text-info" />
+                  <span className="text-foreground">{weatherData.humidity}%</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CloudRain className="h-4 w-4 text-cyan-500" />
-                  <span className="text-gray-700 dark:text-gray-300">{weatherData.precipitation} mm</span>
+                  <CloudRain className="h-4 w-4 text-info" />
+                  <span className="text-foreground">{weatherData.precipitation} mm</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Sun className="h-4 w-4 text-yellow-500" />
-                  <span className="text-gray-700 dark:text-gray-300">{weatherData.cloudiness}%</span>
+                  <Sun className="h-4 w-4 text-warn" />
+                  <span className="text-foreground">{weatherData.cloudiness}%</span>
                 </div>
                 <div className="flex items-center gap-2 col-span-2">
-                  <Leaf className="h-4 w-4 text-green-500" />
-                  <span className="text-gray-700 dark:text-gray-300">{weatherData.windSpeed} m/s</span>
+                  <Leaf className="h-4 w-4 text-ok" />
+                  <span className="text-foreground">{weatherData.windSpeed} m/s</span>
                 </div>
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 capitalize">
+              <p className="text-xs text-foreground mt-2 capitalize">
                 {weatherData.description}
               </p>
             </div>
@@ -248,8 +248,8 @@ export const WeatherMap: React.FC = () => {
 
         {/* Leyenda */}
         {Object.entries(activeWeatherTiles).some(([_, isActive]) => isActive) && (
-          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+          <div className="mt-4 p-3 bg-muted rounded-lg">
+            <p className="text-xs text-foreground mb-2">
               <strong>Capas activas:</strong>
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
@@ -259,7 +259,7 @@ export const WeatherMap: React.FC = () => {
                 return (
                   <div key={tileType} className="flex items-center gap-2">
                     <div className={`w-3 h-3 ${config.color} rounded`}></div>
-                    <span className="text-gray-700 dark:text-gray-300">
+                    <span className="text-foreground">
                       {config.name}
                     </span>
                   </div>

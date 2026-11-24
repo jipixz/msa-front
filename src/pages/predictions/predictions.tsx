@@ -258,31 +258,31 @@ const WeatherMap = () => {
     temperatureTile: { 
       name: 'Temperatura', 
       layer: 'temp_new', 
-      color: 'bg-orange-500', 
+      color: 'bg-warn', 
       icon: Thermometer 
     },
     precipitationTile: { 
       name: 'Precipitación', 
       layer: 'precipitation_new', 
-      color: 'bg-blue-600', 
+      color: 'bg-info', 
       icon: CloudRain 
     },
     cloudsTile: { 
       name: 'Nubes', 
       layer: 'clouds_new', 
-      color: 'bg-gray-400', 
+      color: 'bg-muted', 
       icon: Sun 
     },
     windTile: { 
       name: 'Viento', 
       layer: 'wind_new', 
-      color: 'bg-emerald-500', 
+      color: 'bg-ok', 
       icon: Leaf 
     },
     pressureTile: { 
       name: 'Presión', 
       layer: 'pressure_new', 
-      color: 'bg-purple-500', 
+      color: 'bg-chart-4', 
       icon: Thermometer 
     }
   }
@@ -297,7 +297,7 @@ const WeatherMap = () => {
           Mapa Meteorológico - Cerro Blanco 5ta Sección, Tacotalpa
           <div className="ml-auto flex items-center gap-2 flex-col">
             {lastUpdate && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted-foreground">
                 {timeAgoText}
               </span>
             )}
@@ -316,7 +316,7 @@ const WeatherMap = () => {
       <CardContent>
         {/* Solo controles de capas de tiles globales */}
         <div className="mb-4">
-          <p className="text-md font-medium mb-3 text-gray-700 dark:text-gray-300 text-left">
+          <p className="text-md font-medium mb-3 text-foreground text-left">
             Capas meteorológicas globales:
           </p>
           <div className="flex flex-wrap gap-2">
@@ -331,8 +331,8 @@ const WeatherMap = () => {
                   onClick={() => toggleWeatherTile(key as keyof typeof activeWeatherTiles)}
                   className={`flex items-center gap-2 ${
                     isActive 
-                      ? `${config.color} text-white hover:opacity-90` 
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? `${config.color} text-background hover:opacity-90` 
+                      : 'hover:bg-accent '
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -358,7 +358,7 @@ const WeatherMap = () => {
         </div>
 
         {/* Mapa simplificado */}
-        <div className="h-96 w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 relative">
+        <div className="h-96 w-full rounded-lg overflow-hidden border border-border relative">
           <MapContainer
             center={[CERRO_BLANCO_COORDS.lat, CERRO_BLANCO_COORDS.lng]}
             zoom={12}
@@ -394,7 +394,7 @@ const WeatherMap = () => {
               <Popup>
                 <div className="text-center">
                   <h3 className="font-semibold text-sm mb-2">Cerro Blanco 5ta Sección</h3>
-                  <p className="text-xs text-gray-600 mb-2">Tacotalpa, Tabasco</p>
+                  <p className="text-xs text-foreground mb-2">Tacotalpa, Tabasco</p>
                   {weatherData && (
                     <div className="space-y-1">
                       <p className="text-sm font-medium">{weatherData.description}</p>
@@ -402,7 +402,7 @@ const WeatherMap = () => {
                       <p className="text-xs">💧 {weatherData.humidity}%</p>
                       <p className="text-xs">🌬️ {weatherData.windSpeed} m/s</p>
                       {lastUpdate && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-muted-foreground">
                           {timeAgoText}
                         </p>
                       )}
@@ -416,8 +416,8 @@ const WeatherMap = () => {
               center={[CERRO_BLANCO_COORDS.lat, CERRO_BLANCO_COORDS.lng]}
               radius={3000}
               pathOptions={{
-                color: '#10b981',
-                fillColor: '#10b981',
+                color: 'hsl(var(--ok))',
+                fillColor: 'hsl(var(--ok))',
                 fillOpacity: 0.1,
                 weight: 2,
                 dashArray: '5, 5'
@@ -426,7 +426,7 @@ const WeatherMap = () => {
               <Popup>
                 <div className="text-center">
                   <p className="text-sm font-medium">Área de monitoreo</p>
-                  <p className="text-xs text-gray-600">Radio de 3 kilómetros</p>
+                  <p className="text-xs text-foreground">Radio de 3 kilómetros</p>
                 </div>
               </Popup>
             </Circle>
@@ -434,40 +434,40 @@ const WeatherMap = () => {
 
           {/* Información meteorológica optimizada */}
           {showWeatherInfo && weatherData && (
-            <div className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 max-w-xs z-10">
+            <div className="absolute top-4 right-4 bg-card text-card-foreground border border-border rounded-lg shadow-lg p-4 max-w-xs z-[1000]">
               <div className="flex items-center justify-between mb-3 flex-col">
-                <h4 className="font-semibold text-sm text-gray-800 dark:text-gray-200">
+                <h4 className="font-semibold text-sm text-foreground">
                   Condiciones Actuales
                 </h4>
                 {lastUpdate && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     {timeAgoText}
                   </span>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="flex items-center gap-2">
-                  <Thermometer className="h-4 w-4 text-red-500" />
-                  <span className="text-gray-700 dark:text-gray-300">{weatherData.temperature}°C</span>
+                  <Thermometer className="h-4 w-4 text-bad" />
+                  <span className="text-foreground">{weatherData.temperature}°C</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Droplets className="h-4 w-4 text-blue-500" />
-                  <span className="text-gray-700 dark:text-gray-300">{weatherData.humidity}%</span>
+                  <Droplets className="h-4 w-4 text-info" />
+                  <span className="text-foreground">{weatherData.humidity}%</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CloudRain className="h-4 w-4 text-cyan-500" />
-                  <span className="text-gray-700 dark:text-gray-300">{weatherData.precipitation} mm</span>
+                  <CloudRain className="h-4 w-4 text-info" />
+                  <span className="text-foreground">{weatherData.precipitation} mm</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Sun className="h-4 w-4 text-yellow-500" />
-                  <span className="text-gray-700 dark:text-gray-300">{weatherData.cloudiness}%</span>
+                  <Sun className="h-4 w-4 text-warn" />
+                  <span className="text-foreground">{weatherData.cloudiness}%</span>
                 </div>
                 <div className="flex items-center gap-2 col-span-2">
-                  <Leaf className="h-4 w-4 text-green-500" />
-                  <span className="text-gray-700 dark:text-gray-300">{weatherData.windSpeed} m/s</span>
+                  <Leaf className="h-4 w-4 text-ok" />
+                  <span className="text-foreground">{weatherData.windSpeed} m/s</span>
                 </div>
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 capitalize">
+              <p className="text-xs text-foreground mt-2 capitalize">
                 {weatherData.description}
               </p>
             </div>
@@ -476,8 +476,8 @@ const WeatherMap = () => {
 
         {/* Leyenda simplificada */}
         {Object.entries(activeWeatherTiles).some(([_, isActive]) => isActive) && (
-          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+          <div className="mt-4 p-3 bg-muted rounded-lg">
+            <p className="text-xs text-foreground mb-2">
               <strong>Capas activas:</strong>
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
@@ -487,7 +487,7 @@ const WeatherMap = () => {
                 return (
                   <div key={tileType} className="flex items-center gap-2">
                     <div className={`w-3 h-3 ${config.color} rounded`}></div>
-                    <span className="text-gray-700 dark:text-gray-300">
+                    <span className="text-foreground">
                       {config.name}
                     </span>
                   </div>
@@ -626,7 +626,7 @@ export default function PredictionsPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-full bg-gradient-to-br from-green-50 to-amber-50 dark:from-green-950 dark:to-amber-950 flex items-center justify-center">
+      <div className="w-full h-full flex items-center justify-center">
         <div className="flex items-center space-x-2">
           <Loader2 className="h-6 w-6 animate-spin" />
           <span>Cargando predicciones...</span>
@@ -637,13 +637,13 @@ export default function PredictionsPage() {
 
   if (error) {
     return (
-      <div className="w-full h-full bg-gradient-to-br from-green-50 to-amber-50 dark:from-green-950 dark:to-amber-950 flex items-center justify-center">
+      <div className="w-full h-full flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
+          <h2 className="text-xl font-semibold font-mono text-foreground mb-2">Error</h2>
           <p className="text-muted-foreground mb-4">{error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            className="px-4 py-2 bg-ok text-background rounded-lg hover:bg-ok/15"
           >
             Reintentar
           </button>
@@ -682,69 +682,69 @@ export default function PredictionsPage() {
   const currentSoilMoisture = getCurrentSoilMoisture()
 
   return (
-    <div className="w-full h-full bg-gradient-to-br from-green-50 to-amber-50 dark:from-green-950 dark:to-amber-950">
+    <div className="w-full h-full">
       <div className="w-full h-full p-4 px-8">
         {/* Prediction Status Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-l-4 border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/50">
+          <Card className="">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-orange-800 dark:text-orange-200">Temperatura</p>
-                  <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                  <p className="text-sm font-medium text-warn">Temperatura</p>
+                  <p className="text-2xl font-bold font-mono text-foreground">
                     ↗ {currentTemp.predicted?.toFixed(1) || 0}°C
                   </p>
-                  <p className="text-xs text-orange-600 dark:text-orange-400">Pico en 2 días</p>
+                  <p className="text-xs text-warn">Pico en 2 días</p>
                 </div>
-                <Thermometer className="h-8 w-8 text-orange-500" />
+                <Thermometer className="h-8 w-8 text-warn" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/50">
+          <Card className="">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Humedad</p>
-                  <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  <p className="text-sm font-medium text-info">Humedad</p>
+                  <p className="text-2xl font-bold font-mono text-foreground">
                     ↗ {currentHumidity.predicted?.toFixed(0) || 0}%
                   </p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400">Mejora en 4 días</p>
+                  <p className="text-xs text-info">Mejora en 4 días</p>
                 </div>
-                <Droplets className="h-8 w-8 text-blue-500" />
+                <Droplets className="h-8 w-8 text-info" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-cyan-500 bg-cyan-50/50 dark:bg-cyan-950/50">
+          <Card className="">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-cyan-800 dark:text-cyan-200">Lluvia</p>
-                  <p className="text-2xl font-bold text-cyan-900 dark:text-cyan-100">
+                  <p className="text-sm font-medium text-info">Lluvia</p>
+                  <p className="text-2xl font-bold font-mono text-foreground">
                     {currentRainfall.predicted?.toFixed(0) || 0}mm
                   </p>
-                  <p className="text-xs text-cyan-600 dark:text-cyan-400">
+                  <p className="text-xs text-info">
                     {currentRainfall.probability?.toFixed(0) || 0}% probabilidad
                   </p>
                 </div>
-                <CloudRain className="h-8 w-8 text-cyan-500" />
+                <CloudRain className="h-8 w-8 text-info" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-green-500 bg-green-50/50 dark:bg-green-950/50">
+          <Card className="">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-800 dark:text-green-200">Suelo</p>
-                  <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  <p className="text-sm font-medium text-ok">Suelo</p>
+                  <p className="text-2xl font-bold font-mono text-foreground">
                     ↗ {currentSoilMoisture.predicted?.toFixed(0) || 0}%
                   </p>
-                  <p className="text-xs text-green-600 dark:text-green-400">Óptimo en 5 días</p>
+                  <p className="text-xs text-ok">Óptimo en 5 días</p>
                 </div>
-                <div className="h-8 w-8 bg-green-500 rounded-full flex items-center justify-center">
-                  <div className="h-4 w-4 bg-amber-600 rounded-full"></div>
+                <div className="h-8 w-8 bg-ok rounded-full flex items-center justify-center">
+                  <div className="h-4 w-4 bg-warn rounded-full"></div>
                 </div>
               </div>
             </CardContent>
@@ -769,17 +769,17 @@ export default function PredictionsPage() {
                     border-2 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md
                     ${
                       severity === 'warning' 
-                        ? 'border-amber-200 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/50' 
-                        : 'border-green-200 bg-green-50/80 dark:border-green-800 dark:bg-green-950/50'
+                        ? 'border-warn/40 bg-warn/10 ' 
+                        : 'border-ok/40 bg-ok/10 '
                     }
                   `}
                 >
                   <div className="flex items-start gap-3 flex-col">
                     <div className="flex-shrink-0 mt-0.5 mx-auto">
                       {severity === 'warning' ? (
-                        <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                        <AlertTriangle className="h-5 w-5 text-warn" />
                       ) : (
-                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        <CheckCircle className="h-5 w-5 text-ok" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -787,8 +787,8 @@ export default function PredictionsPage() {
                         font-semibold text-sm sm:text-base mb-2
                         ${
                           severity === 'warning' 
-                            ? 'text-amber-800 dark:text-amber-200' 
-                            : 'text-green-800 dark:text-green-200'
+                            ? 'text-warn ' 
+                            : 'text-ok '
                         }
                       `}>
                         {alert.title || (alert.type === 'temperature' ? 'Alerta de Temperatura:' : 'Condiciones Favorables:')}
@@ -797,8 +797,8 @@ export default function PredictionsPage() {
                         text-sm leading-relaxed
                         ${
                           severity === 'warning' 
-                            ? 'text-amber-700 dark:text-amber-300' 
-                            : 'text-green-700 dark:text-green-300'
+                            ? 'text-warn ' 
+                            : 'text-ok '
                         }
                       `}>
                         <p className="mb-3">{alert.message}</p>
@@ -806,7 +806,7 @@ export default function PredictionsPage() {
                         
                         {(alert.recommendations && alert.recommendations.length > 0) && (
                           <div className="space-y-2">
-                            <p className="font-medium text-gray-900 dark:text-gray-100">
+                            <p className="font-medium text-foreground">
                               Recomendaciones:
                             </p>
                             <ul className="space-y-1.5 ml-0">
@@ -816,8 +816,8 @@ export default function PredictionsPage() {
                                     inline-block w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0
                                     ${
                                       severity === 'warning' 
-                                        ? 'bg-amber-600 dark:bg-amber-400' 
-                                        : 'bg-green-600 dark:bg-green-400'
+                                        ? 'bg-warn ' 
+                                        : 'bg-ok '
                                     }
                                   `}></span>
                                   <span className="text-sm leading-relaxed">{rec}</span>
@@ -830,7 +830,7 @@ export default function PredictionsPage() {
                         
                         {alert.recommendation && (
                           <div className="space-y-2">
-                            <p className="font-medium text-gray-900 dark:text-gray-100">
+                            <p className="font-medium text-foreground">
                               Recomendación:
                             </p>
                             <div className="flex items-start gap-2">
@@ -838,8 +838,8 @@ export default function PredictionsPage() {
                                 inline-block w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0
                                 ${
                                   severity === 'warning' 
-                                    ? 'bg-amber-600 dark:bg-amber-400' 
-                                    : 'bg-green-600 dark:bg-green-400'
+                                    ? 'bg-warn ' 
+                                    : 'bg-ok '
                                 }
                               `}></span>
                               <span className="text-sm leading-relaxed">{alert.recommendation}</span>
@@ -870,7 +870,7 @@ export default function PredictionsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Thermometer className="h-5 w-5 text-orange-500" />
+                    <Thermometer className="h-5 w-5 text-warn" />
                     Predicción de Temperatura
                     <Badge variant="outline" className="ml-auto text-xs">
                       7 días
@@ -883,21 +883,21 @@ export default function PredictionsPage() {
                       <LineChart data={temperatureData?.predictions || []}>
                         <XAxis dataKey="day" tickFormatter={formatDayLabel} />
                         <YAxis domain={[25, 40]} />
-                        <ReferenceLine y={OPTIMAL_TEMPERATURE} stroke="#10b981" strokeDasharray="5 5" label="Óptimo Cacao" />
+                        <ReferenceLine y={OPTIMAL_TEMPERATURE} stroke="hsl(var(--ok))" strokeDasharray="5 5" label="Óptimo Cacao" />
                         <Line
                           type="monotone"
                           dataKey="predicted"
-                          stroke="#f97316"
+                          stroke="hsl(var(--warn))"
                           strokeWidth={3}
                           strokeDasharray="5 5"
-                          dot={{ fill: "#f97316", r: 4 }}
+                          dot={{ fill: "hsl(var(--warn))", r: 4 }}
                         />
                         <Line
                           type="monotone"
                           dataKey="actual"
-                          stroke="#ef4444"
+                          stroke="hsl(var(--bad))"
                           strokeWidth={2}
-                          dot={{ fill: "#ef4444", r: 3 }}
+                          dot={{ fill: "hsl(var(--bad))", r: 3 }}
                         />
                       </LineChart>
                     </ResponsiveContainer>
@@ -909,7 +909,7 @@ export default function PredictionsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Droplets className="h-5 w-5 text-blue-500" />
+                    <Droplets className="h-5 w-5 text-info" />
                     Predicción de Humedad
                     <Badge variant="outline" className="ml-auto text-xs">
                       7 días
@@ -922,12 +922,12 @@ export default function PredictionsPage() {
                       <AreaChart data={humidityData?.predictions || []}>
                         <XAxis dataKey="day" tickFormatter={formatDayLabel} />
                         <YAxis domain={[40, 100]} />
-                        <ReferenceLine y={OPTIMAL_HUMIDITY} stroke="#10b981" strokeDasharray="5 5" label="Óptimo Cacao" />
+                        <ReferenceLine y={OPTIMAL_HUMIDITY} stroke="hsl(var(--ok))" strokeDasharray="5 5" label="Óptimo Cacao" />
                         <Area
                           type="monotone"
                           dataKey="predicted"
-                          stroke="#3b82f6"
-                          fill="#3b82f6"
+                          stroke="hsl(var(--chart-1))"
+                          fill="hsl(var(--chart-1))"
                           fillOpacity={0.3}
                         />
                       </AreaChart>
@@ -944,7 +944,7 @@ export default function PredictionsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Thermometer className="h-5 w-5 text-orange-500" />
+                    <Thermometer className="h-5 w-5 text-warn" />
                     Temperatura Detallada
                   </CardTitle>
                 </CardHeader>
@@ -954,20 +954,20 @@ export default function PredictionsPage() {
                       <LineChart data={temperatureData?.predictions || []}>
                         <XAxis dataKey="day" tickFormatter={formatDayLabel} />
                         <YAxis domain={[20, 40]} />
-                        <ReferenceLine y={OPTIMAL_TEMPERATURE} stroke="#10b981" strokeDasharray="5 5" label="Óptimo Cacao" />
+                        <ReferenceLine y={OPTIMAL_TEMPERATURE} stroke="hsl(var(--ok))" strokeDasharray="5 5" label="Óptimo Cacao" />
                         <Line
                           type="monotone"
                           dataKey="predicted"
-                          stroke="#f97316"
+                          stroke="hsl(var(--warn))"
                           strokeWidth={3}
-                          dot={{ fill: "#f97316", r: 4 }}
+                          dot={{ fill: "hsl(var(--warn))", r: 4 }}
                         />
                         <Line
                           type="monotone"
                           dataKey="actual"
-                          stroke="#ef4444"
+                          stroke="hsl(var(--bad))"
                           strokeWidth={2}
-                          dot={{ fill: "#ef4444", r: 3 }}
+                          dot={{ fill: "hsl(var(--bad))", r: 3 }}
                         />
                       </LineChart>
                     </ResponsiveContainer>
@@ -979,7 +979,7 @@ export default function PredictionsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <CloudRain className="h-5 w-5 text-cyan-500" />
+                    <CloudRain className="h-5 w-5 text-info" />
                     Predicción de Lluvia
                   </CardTitle>
                 </CardHeader>
@@ -989,8 +989,8 @@ export default function PredictionsPage() {
                       <BarChart data={rainfallData?.predictions || []}>
                         <XAxis dataKey="day" tickFormatter={formatDayLabel} />
                         <YAxis />
-                        <Bar dataKey="predicted" fill="#06b6d4" />
-                        <Bar dataKey="probability" fill="#0891b2" fillOpacity={0.6} />
+                        <Bar dataKey="predicted" fill="hsl(var(--info))" />
+                        <Bar dataKey="probability" fill="hsl(var(--info))" fillOpacity={0.6} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -1003,7 +1003,7 @@ export default function PredictionsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Leaf className="h-5 w-5 text-green-500" />
+                  <Leaf className="h-5 w-5 text-ok" />
                   Humedad del Suelo
                 </CardTitle>
               </CardHeader>
@@ -1013,20 +1013,20 @@ export default function PredictionsPage() {
                     <LineChart data={soilMoistureData?.predictions || []}>
                       <XAxis dataKey="day" tickFormatter={formatDayLabel} />
                       <YAxis domain={[20, 80]} />
-                      <ReferenceLine y={OPTIMAL_SOIL_MOISTURE} stroke="#10b981" strokeDasharray="5 5" label="Óptimo Cacao" />
+                      <ReferenceLine y={OPTIMAL_SOIL_MOISTURE} stroke="hsl(var(--ok))" strokeDasharray="5 5" label="Óptimo Cacao" />
                       <Line
                         type="monotone"
                         dataKey="predicted"
-                        stroke="#22c55e"
+                        stroke="hsl(var(--ok))"
                         strokeWidth={3}
-                        dot={{ fill: "#22c55e", r: 4 }}
+                        dot={{ fill: "hsl(var(--ok))", r: 4 }}
                       />
                       <Line
                         type="monotone"
                         dataKey="actual"
-                        stroke="#16a34a"
+                        stroke="hsl(var(--ok))"
                         strokeWidth={2}
-                        dot={{ fill: "#16a34a", r: 3 }}
+                        dot={{ fill: "hsl(var(--ok))", r: 3 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -1036,7 +1036,7 @@ export default function PredictionsPage() {
           </TabsContent>
 
           <TabsContent value="recommendations" className="mt-6">
-            <div className=" mx-auto space-y-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="mx-auto space-y-1 grid grid-cols-1 md:grid-cols-3 gap-4">
               {alertsData?.alerts && alertsData.alerts.length > 0 ? (
                 alertsData.alerts.map((alert, index) => {
                   const isWarning = alert.type === 'warning';
@@ -1049,17 +1049,17 @@ export default function PredictionsPage() {
                         border-2 rounded-lg shadow-sm
                         ${
                           severity === 'warning' 
-                            ? 'border-amber-200 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/50' 
-                            : 'border-green-200 bg-green-50/80 dark:border-green-800 dark:bg-green-950/50'
+                            ? 'border-warn/40 bg-warn/10 ' 
+                            : 'border-ok/40 bg-ok/10 '
                         }
                       `}
                     >
                       <div className="flex items-start gap-3 flex-col">
                         <div className="flex-shrink-0 mt-0.5 mx-auto">
                           {severity === 'warning' ? (
-                            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                            <AlertTriangle className="h-5 w-5 text-warn" />
                           ) : (
-                            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                            <CheckCircle className="h-5 w-5 text-ok" />
                           )}
                         </div>
                         <div className="flex-1">
@@ -1067,8 +1067,8 @@ export default function PredictionsPage() {
                             font-semibold text-base mb-2
                             ${
                               severity === 'warning' 
-                                ? 'text-amber-800 dark:text-amber-200' 
-                                : 'text-green-800 dark:text-green-200'
+                                ? 'text-warn ' 
+                                : 'text-ok '
                             }
                           `}>
                             {alert.title || (alert.type === 'temperature' ? 'Alerta de Temperatura:' : 'Condiciones Favorables:')}
@@ -1077,15 +1077,15 @@ export default function PredictionsPage() {
                             text-sm leading-relaxed
                             ${
                               severity === 'warning' 
-                                ? 'text-amber-700 dark:text-amber-300' 
-                                : 'text-green-700 dark:text-green-300'
+                                ? 'text-warn ' 
+                                : 'text-ok '
                             }
                           `}>
                             <p className="mb-3">{alert.message}</p>
                             
                             {(alert.recommendations && alert.recommendations.length > 0) && (
                               <div className="space-y-2">
-                                <p className="font-medium text-gray-900 dark:text-gray-100">
+                                <p className="font-medium text-foreground">
                                   Recomendaciones:
                                 </p>
                                 <ul className="space-y-2 ml-0">
@@ -1095,8 +1095,8 @@ export default function PredictionsPage() {
                                         inline-block w-2 h-2 rounded-full mt-1.5 flex-shrink-0
                                         ${
                                           severity === 'warning' 
-                                            ? 'bg-amber-600 dark:bg-amber-400' 
-                                            : 'bg-green-600 dark:bg-green-400'
+                                            ? 'bg-warn ' 
+                                            : 'bg-ok '
                                         }
                                       `}></span>
                                       <span className="text-sm leading-relaxed">{rec}</span>
@@ -1108,7 +1108,7 @@ export default function PredictionsPage() {
                             
                             {alert.recommendation && (
                               <div className="space-y-2">
-                                <p className="font-medium text-gray-900 dark:text-gray-100">
+                                <p className="font-medium text-foreground">
                                   Recomendación:
                                 </p>
                                 <div className="flex items-start gap-2">
@@ -1116,8 +1116,8 @@ export default function PredictionsPage() {
                                     inline-block w-2 h-2 rounded-full mt-1.5 flex-shrink-0
                                     ${
                                       severity === 'warning' 
-                                        ? 'bg-amber-600 dark:bg-amber-400' 
-                                        : 'bg-green-600 dark:bg-green-400'
+                                        ? 'bg-warn ' 
+                                        : 'bg-ok '
                                     }
                                   `}></span>
                                   <span className="text-sm leading-relaxed">{alert.recommendation}</span>
@@ -1133,11 +1133,11 @@ export default function PredictionsPage() {
               ) : (
                 <Card>
                   <CardContent className="p-8 text-center">
-                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    <CheckCircle className="h-12 w-12 text-ok mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
                       No hay alertas activas
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-foreground">
                       Las condiciones actuales son favorables para el cultivo de cacao.
                     </p>
                   </CardContent>

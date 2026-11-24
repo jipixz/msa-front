@@ -36,9 +36,9 @@ export default function ForgotPasswordPage() {
               <div className="grid gap-2">
                 <Label htmlFor="email">Correo</Label>
                 <Input id="email" value={email} onChange={(e)=>setEmail(e.target.value)} type="email" required pattern="[^\s@]+@[^\s@]+\.[^\s@]+" />
-                {!emailValid && email.length>0 && <div className="text-xs text-red-500">Correo inválido</div>}
+                {!emailValid && email.length>0 && <div className="text-xs text-bad">Correo inválido</div>}
               </div>
-              {error && <div className="text-sm text-red-500">{error}</div>}
+              {error && <div className="text-sm text-bad">{error}</div>}
               <Button type="submit" disabled={!emailValid}>Enviar</Button>
             </form>
           )}

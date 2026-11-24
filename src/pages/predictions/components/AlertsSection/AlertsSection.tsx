@@ -25,17 +25,17 @@ export const AlertsSection: React.FC<AlertsSectionProps> = ({alertsData}) => {
               border-2 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md
               ${
                 severity === 'warning' 
-                  ? 'border-amber-200 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/50' 
-                  : 'border-green-200 bg-green-50/80 dark:border-green-800 dark:bg-green-950/50'
+                  ? 'border-warn/40 bg-warn/10 ' 
+                  : 'border-ok/40 bg-ok/10 '
               }
             `}
           >
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 mt-0.5">
                 {severity === 'warning' ? (
-                  <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                  <AlertTriangle className="h-5 w-5 text-warn" />
                 ) : (
-                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  <CheckCircle className="h-5 w-5 text-ok" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -43,8 +43,8 @@ export const AlertsSection: React.FC<AlertsSectionProps> = ({alertsData}) => {
                   font-semibold text-sm sm:text-base mb-2
                   ${
                     severity === 'warning' 
-                      ? 'text-amber-800 dark:text-amber-200' 
-                      : 'text-green-800 dark:text-green-200'
+                      ? 'text-warn ' 
+                      : 'text-ok '
                   }
                 `}>
                   {alert.title || (alert.type === 'temperature' ? 'Alerta de Temperatura:' : 'Condiciones Favorables:')}
@@ -53,8 +53,8 @@ export const AlertsSection: React.FC<AlertsSectionProps> = ({alertsData}) => {
                   text-sm leading-relaxed
                   ${
                     severity === 'warning' 
-                      ? 'text-amber-700 dark:text-amber-300' 
-                      : 'text-green-700 dark:text-green-300'
+                      ? 'text-warn ' 
+                      : 'text-ok '
                   }
                 `}>
                   <p className="mb-3">{alert.message}</p>
@@ -62,7 +62,7 @@ export const AlertsSection: React.FC<AlertsSectionProps> = ({alertsData}) => {
                   {/* Recomendaciones múltiples */}
                   {(alert.recommendations && alert.recommendations.length > 0) && (
                     <div className="space-y-2">
-                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                      <p className="font-medium text-foreground">
                         Recomendaciones:
                       </p>
                       <ul className="space-y-1.5 ml-0">
@@ -72,8 +72,8 @@ export const AlertsSection: React.FC<AlertsSectionProps> = ({alertsData}) => {
                               inline-block w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0
                               ${
                                 severity === 'warning' 
-                                  ? 'bg-amber-600 dark:bg-amber-400' 
-                                  : 'bg-green-600 dark:bg-green-400'
+                                  ? 'bg-warn ' 
+                                  : 'bg-ok '
                               }
                             `}></span>
                             <span className="text-sm leading-relaxed">{rec}</span>
@@ -86,7 +86,7 @@ export const AlertsSection: React.FC<AlertsSectionProps> = ({alertsData}) => {
                   {/* Recomendación única */}
                   {alert.recommendation && (
                     <div className="space-y-2">
-                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                      <p className="font-medium text-foreground">
                         Recomendación:
                       </p>
                       <div className="flex items-start gap-2">
@@ -94,8 +94,8 @@ export const AlertsSection: React.FC<AlertsSectionProps> = ({alertsData}) => {
                           inline-block w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0
                           ${
                             severity === 'warning' 
-                              ? 'bg-amber-600 dark:bg-amber-400' 
-                              : 'bg-green-600 dark:bg-green-400'
+                              ? 'bg-warn ' 
+                              : 'bg-ok '
                           }
                         `}></span>
                         <span className="text-sm leading-relaxed">{alert.recommendation}</span>

@@ -48,7 +48,7 @@ export default function ResetPasswordPage() {
                 <Label>Confirmar contraseña</Label>
                 <Input type="password" value={confirm} onChange={(e)=>setConfirm(e.target.value)} required />
               </div>
-              {error && <div className="text-sm text-red-500">{error}</div>}
+              {error && <div className="text-sm text-bad">{error}</div>}
               <Button type="submit">Actualizar</Button>
             </form>
           )}

@@ -440,7 +440,7 @@ export default function ProductionPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-full bg-gradient-to-br from-green-50 to-amber-50 dark:from-green-950 dark:to-amber-950 flex items-center justify-center">
+      <div className="w-full h-full flex items-center justify-center">
         <div className="flex items-center space-x-2">
           <Loader2 className="h-6 w-6 animate-spin" />
           <span>Cargando datos de producción...</span>
@@ -450,17 +450,17 @@ export default function ProductionPage() {
   }
 
   return (
-    <div className="w-full h-full bg-gradient-to-br from-green-50 to-amber-50 dark:from-green-950 dark:to-amber-950">
+    <div className="w-full h-full">
       <div className="w-full h-full p-4 px-8">
         {/* Header con botón de agregar */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <div className="flex-1 text-center md:text-left">
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Producción de Cacao</h1>
-            <p className="text-gray-600 dark:text-gray-300">Gestión y seguimiento de la producción artesanal</p>
+            <h1 className="text-2xl font-bold text-foreground">Producción de Cacao</h1>
+            <p className="text-foreground">Gestión y seguimiento de la producción artesanal</p>
           </div>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button className="bg-ok hover:bg-ok/15">
                 <Plus className="h-4 w-4 mr-2" />
                 Nuevo Registro
               </Button>
@@ -474,9 +474,9 @@ export default function ProductionPage() {
               </DialogHeader>
               
               {error && (
-                <Alert className="border-red-200 bg-red-50">
-                  <AlertTriangle className="h-4 w-4 text-red-600" />
-                  <AlertDescription className="text-red-800">{error}</AlertDescription>
+                <Alert className="border-bad/40 bg-bad/10">
+                  <AlertTriangle className="h-4 w-4 text-bad" />
+                  <AlertDescription className="text-bad">{error}</AlertDescription>
                 </Alert>
               )}
 
@@ -702,7 +702,7 @@ export default function ProductionPage() {
                             <X className="h-4 w-4" />
                           </Button>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">Imagen {index + 1}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Imagen {index + 1}</p>
                       </div>
                     ))}
                   </div>
@@ -716,7 +716,7 @@ export default function ProductionPage() {
                 <Button 
                   onClick={createProductionRecord} 
                   disabled={submitting}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-ok hover:bg-ok/15"
                 >
                   {submitting ? (
                     <>
@@ -734,66 +734,66 @@ export default function ProductionPage() {
 
         {/* Mensaje de éxito */}
         {success && (
-          <Alert className="mb-6 border-green-200 bg-green-50">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800">{success}</AlertDescription>
+          <Alert className="mb-6 border-ok/40 bg-ok/10">
+            <CheckCircle className="h-4 w-4 text-ok" />
+            <AlertDescription className="text-ok">{success}</AlertDescription>
           </Alert>
         )}
 
         {/* Cards de estadísticas del mes actual */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <Card className="border-l-4 border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/50">
+          <Card className="">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Producción del Mes</p>
-                  <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  <p className="text-sm font-medium text-info">Producción del Mes</p>
+                  <p className="text-2xl font-bold font-mono text-foreground">
                     {currentMonthStats.total_produccion.toFixed(1)} kg
                   </p>
                 </div>
-                <Weight className="h-8 w-8 text-blue-500" />
+                <Weight className="h-8 w-8 text-info" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-green-500 bg-green-50/50 dark:bg-green-950/50">
+          <Card className="">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-800 dark:text-green-200">Ingresos del Mes</p>
-                  <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  <p className="text-sm font-medium text-ok">Ingresos del Mes</p>
+                  <p className="text-2xl font-bold font-mono text-foreground">
                     {formatCurrency(currentMonthStats.total_ingresos)}
                   </p>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-500" />
+                <DollarSign className="h-8 w-8 text-ok" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/50">
+          <Card className="">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-orange-800 dark:text-orange-200">Precio Promedio</p>
-                  <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                  <p className="text-sm font-medium text-warn">Precio Promedio</p>
+                  <p className="text-2xl font-bold font-mono text-foreground">
                     {formatCurrency(currentMonthStats.precio_promedio)}
                   </p>
                 </div>
-                <TrendingUp className="h-8 w-8 text-orange-500" />
+                <TrendingUp className="h-8 w-8 text-warn" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/50">
+          <Card className="">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-purple-800 dark:text-purple-200">Cacao Orgánico</p>
-                  <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                  <p className="text-sm font-medium text-chart-4">Cacao Orgánico</p>
+                  <p className="text-2xl font-bold font-mono text-foreground">
                     {currentMonthData.filter(r => r.calidad === 'Orgánico').reduce((sum, r) => sum + r.cantidad_kg, 0).toFixed(1)} kg
                   </p>
                 </div>
-                <Package className="h-8 w-8 text-purple-500" />
+                <Package className="h-8 w-8 text-chart-4" />
               </div>
             </CardContent>
           </Card>
@@ -814,7 +814,7 @@ export default function ProductionPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-blue-500" />
+                    <TrendingUp className="h-5 w-5 text-info" />
                     Producción Mensual
                   </CardTitle>
                 </CardHeader>
@@ -825,7 +825,7 @@ export default function ProductionPage() {
                         <XAxis dataKey="mes" />
                         <YAxis />
                         <Tooltip formatter={(value: any) => [`${value} kg`, 'Producción']} />
-                        <Bar dataKey="cantidad" fill="#3b82f6" />
+                        <Bar dataKey="cantidad" fill="hsl(var(--chart-1))" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -836,7 +836,7 @@ export default function ProductionPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Package className="h-5 w-5 text-purple-500" />
+                    <Package className="h-5 w-5 text-chart-4" />
                     Distribución por Calidad
                   </CardTitle>
                 </CardHeader>
@@ -874,65 +874,65 @@ export default function ProductionPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-gray-500" />
+                  <FileText className="h-5 w-5 text-muted-foreground" />
                   Historial de Producción
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {/* Cards de estadísticas filtradas */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  <Card className="border-l-4 border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/50">
+                  <Card className="">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Registros Filtrados</p>
-                          <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                          <p className="text-sm font-medium text-info">Registros Filtrados</p>
+                          <p className="text-2xl font-bold font-mono text-foreground">
                             {filteredStats.total_registros}
                           </p>
                         </div>
-                        <FileText className="h-8 w-8 text-blue-500" />
+                        <FileText className="h-8 w-8 text-info" />
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="border-l-4 border-l-green-500 bg-green-50/50 dark:bg-green-950/50">
+                  <Card className="">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-green-800 dark:text-green-200">Producción Filtrada</p>
-                          <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                          <p className="text-sm font-medium text-ok">Producción Filtrada</p>
+                          <p className="text-2xl font-bold font-mono text-foreground">
                             {filteredStats.total_produccion.toFixed(1)} kg
                           </p>
                         </div>
-                        <Weight className="h-8 w-8 text-green-500" />
+                        <Weight className="h-8 w-8 text-ok" />
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="border-l-4 border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/50">
+                  <Card className="">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-orange-800 dark:text-orange-200">Ingresos Filtrados</p>
-                          <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                          <p className="text-sm font-medium text-warn">Ingresos Filtrados</p>
+                          <p className="text-2xl font-bold font-mono text-foreground">
                             {formatCurrency(filteredStats.total_ingresos)}
                           </p>
                         </div>
-                        <DollarSign className="h-8 w-8 text-orange-500" />
+                        <DollarSign className="h-8 w-8 text-warn" />
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="border-l-4 border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/50">
+                  <Card className="">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-purple-800 dark:text-purple-200">Orgánico Filtrado</p>
-                          <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                          <p className="text-sm font-medium text-chart-4">Orgánico Filtrado</p>
+                          <p className="text-2xl font-bold font-mono text-foreground">
                             {registrosFiltradosYOrdenados.filter(r => r.calidad === 'Orgánico').reduce((sum, r) => sum + r.cantidad_kg, 0).toFixed(1)} kg
                           </p>
                         </div>
-                        <Package className="h-8 w-8 text-purple-500" />
+                        <Package className="h-8 w-8 text-chart-4" />
                       </div>
                     </CardContent>
                   </Card>
@@ -1050,7 +1050,7 @@ export default function ProductionPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead 
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                          className="cursor-pointer hover:bg-accent"
                           onClick={() => cambiarOrdenamiento("fecha_cosecha")}
                         >
                           Fecha Cosecha {ordenarPor === "fecha_cosecha" && (ordenDescendente ? "↓" : "↑")}
@@ -1058,20 +1058,20 @@ export default function ProductionPage() {
                         <TableHead>Parcela</TableHead>
                         <TableHead>Variedad</TableHead>
                         <TableHead 
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                          className="cursor-pointer hover:bg-accent"
                           onClick={() => cambiarOrdenamiento("cantidad_kg")}
                         >
                           Cantidad (kg) {ordenarPor === "cantidad_kg" && (ordenDescendente ? "↓" : "↑")}
                         </TableHead>
                         <TableHead>Calidad</TableHead>
                         <TableHead 
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                          className="cursor-pointer hover:bg-accent"
                           onClick={() => cambiarOrdenamiento("humedad_porcentaje")}
                         >
                           Humedad (%) {ordenarPor === "humedad_porcentaje" && (ordenDescendente ? "↓" : "↑")}
                         </TableHead>
                         <TableHead 
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                          className="cursor-pointer hover:bg-accent"
                           onClick={() => cambiarOrdenamiento("precio_kg")}
                         >
                           Precio/kg {ordenarPor === "precio_kg" && (ordenDescendente ? "↓" : "↑")}
@@ -1096,7 +1096,7 @@ export default function ProductionPage() {
                                 record.calidad === 'Orgánico' ? 'default' : 
                                 'destructive'
                               }
-                              className={record.calidad === 'Orgánico' ? 'bg-green-100 text-green-800 border-green-200' : ''}
+                              className={record.calidad === 'Orgánico' ? 'bg-ok/10 text-ok border-ok/40' : ''}
                             >
                               {record.calidad}
                             </Badge>
@@ -1127,13 +1127,13 @@ export default function ProductionPage() {
                                   <Download className="h-4 w-4" />
                                 </Button>
                                 {record.imagenes.length > 1 && (
-                                  <span className="text-xs text-gray-500 ml-1">
+                                  <span className="text-xs text-muted-foreground ml-1">
                                     +{record.imagenes.length - 1}
                                   </span>
                                 )}
                               </div>
                             ) : (
-                              <span className="text-gray-400 text-sm">Sin imágenes</span>
+                              <span className="text-muted-foreground text-sm">Sin imágenes</span>
                             )}
                           </TableCell>
                         </TableRow>
@@ -1143,7 +1143,7 @@ export default function ProductionPage() {
                 </div>
                 
                 {registrosFiltradosYOrdenados.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     No se encontraron registros con los filtros aplicados
                   </div>
                 )}
@@ -1165,7 +1165,7 @@ export default function ProductionPage() {
                         <XAxis dataKey="fecha_cosecha" tickFormatter={formatDate} />
                         <YAxis />
                         <Tooltip formatter={(value: any) => [formatCurrency(Number(value)), 'Precio/kg']} />
-                        <Line type="monotone" dataKey="precio_kg" stroke="#f97316" strokeWidth={2} />
+                        <Line type="monotone" dataKey="precio_kg" stroke="hsl(var(--warn))" strokeWidth={2} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -1184,9 +1184,9 @@ export default function ProductionPage() {
                         <XAxis dataKey="fecha_cosecha" tickFormatter={formatDate} />
                         <YAxis />
                         <Tooltip formatter={(value: any) => [`${value}%`, 'Humedad']} />
-                        <Line type="monotone" dataKey="humedad_porcentaje" stroke="#06b6d4" strokeWidth={2} />
+                        <Line type="monotone" dataKey="humedad_porcentaje" stroke="hsl(var(--info))" strokeWidth={2} />
                         {productionRecords[0]?.humedad_final && (
-                          <Line type="monotone" dataKey="humedad_final" stroke="#84cc16" strokeWidth={2} strokeDasharray="5 5" />
+                          <Line type="monotone" dataKey="humedad_final" stroke="hsl(var(--ok))" strokeWidth={2} strokeDasharray="5 5" />
                         )}
                       </LineChart>
                     </ResponsiveContainer>
@@ -1248,7 +1248,7 @@ export default function ProductionPage() {
                         <XAxis dataKey="parcela" />
                         <YAxis />
                         <Tooltip formatter={(value: any) => [`${value} kg`, 'Producción']} />
-                        <Bar dataKey="cantidad" fill="#10b981" />
+                        <Bar dataKey="cantidad" fill="hsl(var(--ok))" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -1270,7 +1270,7 @@ export default function ProductionPage() {
                 <DialogTitle>
                   Galería de Imágenes 
                   {previewImages.length > 1 && (
-                    <span className="text-sm font-normal text-gray-500 ml-2">
+                    <span className="text-sm font-normal text-muted-foreground ml-2">
                       ({currentImageIndex + 1} de {previewImages.length})
                     </span>
                   )}
@@ -1321,8 +1321,8 @@ export default function ProductionPage() {
                         }}
                         className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden ${
                           index === currentImageIndex 
-                            ? 'border-blue-500 ring-2 ring-blue-200' 
-                            : 'border-gray-300 hover:border-gray-400'
+                            ? 'border-info/40 ring-2 ring-info' 
+                            : 'border-border hover:border-border'
                         }`}
                       >
                         <img

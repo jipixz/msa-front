@@ -6,17 +6,24 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Home, TrendingUp, Database, User, Bell, Menu, X, Leaf, LogOut, Lock, Shield } from "lucide-react"
+import { SelectorEstilo } from "@/estilos/SelectorEstilo"
+import { Home, TrendingUp, Database, User, Bell, Menu, X, Leaf, LogOut, Lock, Shield, LineChart } from "lucide-react"
 import { useAuthStore } from "@/lib/auth-store"
 import { useNotificationsStore, initNotifications } from "@/lib/notifications-store"
 import { API_URL } from "@/lib/api"
 
 const navigationItems = [
   {
-    name: "Dashboard",
+    name: "Panel",
     href: "/",
     icon: Home,
-    description: "Monitoreo en tiempo real",
+    description: "Estado de la finca",
+  },
+  {
+    name: "Gráficas",
+    href: "/graficas",
+    icon: LineChart,
+    description: "Detalle por variable",
   },
   {
     name: "Predicciones",
@@ -48,8 +55,8 @@ export default function Navigation() {
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Leaf className="h-6 w-6 text-green-600" />
+              <div className="p-2 bg-ok/10 rounded-lg">
+                <Leaf className="h-6 w-6 text-ok" />
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg font-semibold text-foreground">AgroMonitor</h1>
@@ -68,7 +75,7 @@ export default function Navigation() {
                   <Button
                     variant={isActive ? "default" : "ghost"}
                     className={`flex items-center space-x-2 ${
-                      isActive ? "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-100 dark:hover:bg-green-800" : "text-muted-foreground hover:text-foreground"
+                      isActive ? "bg-ok/10 text-ok hover:bg-ok/15 " : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -83,8 +90,8 @@ export default function Navigation() {
           <div className="flex items-center space-x-4">
             {/* Status Badge */}
             {user && (
-              <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 hidden sm:flex">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+              <Badge variant="secondary" className="bg-ok/10 text-ok border-ok/40 hidden sm:flex">
+                <div className="w-2 h-2 bg-ok rounded-full mr-2 animate-pulse"></div>
                 Sistema Activo
               </Badge>
             )}
@@ -95,7 +102,7 @@ export default function Navigation() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="relative">
                     <Bell className="h-5 w-5" />
-                    {unreadCount > 0 && <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center">{unreadCount}</span>}
+                    {unreadCount > 0 && <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-bad text-background rounded-full text-[10px] flex items-center justify-center">{unreadCount}</span>}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-80">
@@ -105,10 +112,13 @@ export default function Navigation() {
                   ) : (
                     notifications.slice(0, 8).map(n => {
                       const isAlert = n.kind === 'alert'
-                      const alertColor = n.priority === 'urgent' ? 'border-l-red-500' : n.priority === 'high' ? 'border-l-orange-500' : 'border-l-amber-500'
+                      const alertColor = n.priority === 'urgent' || n.priority === 'high' ? 'text-bad' : 'text-warn'
                       return (
-                        <div key={n.id} className={`px-2 py-2 text-sm ${n.read ? 'opacity-70' : ''} ${isAlert ? `border-l-4 ${alertColor} bg-amber-50/50 dark:bg-amber-950/20` : ''}`}>
-                          <div className="font-medium">{n.title}</div>
+                        <div key={n.id} className={`px-2 py-2 text-sm ${n.read ? 'opacity-70' : ''}`}>
+                          <div className="font-medium">
+                            {isAlert && <span className={`mr-1 font-mono text-xs uppercase ${alertColor}`}>[{n.priority === 'urgent' ? 'urgente' : n.priority === 'high' ? 'alta' : 'alerta'}]</span>}
+                            {n.title}
+                          </div>
                           <div className="text-xs text-muted-foreground">{n.message}</div>
                           <div className="text-[10px] text-muted-foreground">{new Date(n.timestamp).toLocaleString('es-ES')}</div>
                         </div>
@@ -124,6 +134,7 @@ export default function Navigation() {
             )}
 
             {/* Theme Toggle */}
+            <SelectorEstilo />
             <ThemeToggle />
 
             {/* User Menu */}
@@ -185,7 +196,7 @@ export default function Navigation() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 py-4">
+          <div className="md:hidden border-t border-border py-4">
             <div className="space-y-2">
               {navigationItems.map((item) => {
                 const isActive = location.pathname === item.href
@@ -194,7 +205,7 @@ export default function Navigation() {
                   <Link key={item.name} to={item.href}>
                     <div
                       className={`flex items-center space-x-3 px-3 py-2 rounded-lg ${
-                        isActive ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100" : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                        isActive ? "bg-ok/10 text-ok " : "text-muted-foreground hover:bg-accent hover:text-foreground"
                       }`}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >

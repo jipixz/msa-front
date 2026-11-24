@@ -134,15 +134,15 @@ function emptyRule(): Rule {
 function priorityBadgeColor(p?: string) {
   switch (p) {
     case "urgent":
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
+      return "bg-bad/10 text-bad "
     case "high":
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100"
+      return "bg-warn/10 text-warn "
     case "low":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+      return "bg-info/10 text-info "
     case "min":
-      return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-100"
+      return "bg-muted text-foreground "
     default:
-      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+      return "bg-ok/10 text-ok "
   }
 }
 
@@ -262,7 +262,7 @@ export default function NotifierAdminPage() {
             </Button>
           </Link>
           <h1 className="text-2xl font-semibold flex items-center gap-2">
-            <Bell className="h-6 w-6 text-green-600" /> Notificaciones
+            <Bell className="h-6 w-6 text-ok" /> Notificaciones
           </h1>
           <Badge variant="secondary">
             {enabledCount}/{rules.length} activas

@@ -34,7 +34,7 @@ export default function LoginForm({ /*className,  ...props */ }: React.Component
                 <div className="grid gap-2">
                   <Label htmlFor="email">Correo</Label>
                   <Input id="email" type="email" placeholder="m@example.com" required pattern="[^\s@]+@[^\s@]+\.[^\s@]+" value={email} onChange={(e)=>setEmail(e.target.value)} />
-                  {!emailValid && email.length>0 && <div className="text-xs text-red-500">Correo inválido</div>}
+                  {!emailValid && email.length>0 && <div className="text-xs text-bad">Correo inválido</div>}
                 </div>
                 <div className="grid gap-2">
                   <div className="flex items-center">
@@ -42,7 +42,7 @@ export default function LoginForm({ /*className,  ...props */ }: React.Component
                   </div>
                   <Input id="password" type="password" required value={password} onChange={(e)=>setPassword(e.target.value)} />
                 </div>
-                {error && <div className="text-sm text-red-500">{error}</div>}
+                {error && <div className="text-sm text-bad">{error}</div>}
                 <Button type="submit" className="w-full" disabled={loading || !emailValid}>
                   {loading ? 'Ingresando...' : 'Iniciar sesión'}
                 </Button>
@@ -68,7 +68,7 @@ export default function LoginForm({ /*className,  ...props */ }: React.Component
               </div>
             </form>
             <div className="relative hidden bg-muted md:block">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent dark:from-white/10 dark:to-transparent z-10"></div>
+              <div className="absolute inset-0 from-black/40 to-transparent dark:from-white/10 dark:to-transparent z-10"></div>
               <img
                 src="/login.png"
                 alt="Image"

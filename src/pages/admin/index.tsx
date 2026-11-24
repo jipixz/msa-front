@@ -90,8 +90,8 @@ export default function AdminPage() {
       <Card className="md:col-span-2">
         <CardContent className="p-4 flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg dark:bg-green-900">
-              <Bell className="h-5 w-5 text-green-700 dark:text-green-200" />
+            <div className="p-2 bg-ok/10 rounded-lg">
+              <Bell className="h-5 w-5 text-ok" />
             </div>
             <div>
               <div className="font-medium">Sistema de notificaciones</div>
@@ -232,7 +232,7 @@ export default function AdminPage() {
                 <input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
               </div>
               {customAvatar && (
-                <div className="flex items-center gap-2 text-sm text-green-600">
+                <div className="flex items-center gap-2 text-sm text-ok">
                   <span>Imagen seleccionada: {customAvatar.name}</span>
                   <Button type="button" size="sm" variant="ghost" onClick={() => setCustomAvatar(null)}>
                     <X className="h-3 w-3" />

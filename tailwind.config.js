@@ -51,6 +51,23 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Estados semánticos: los define cada estilo (src/estilos/registro.ts)
+        ok: "hsl(var(--ok) / <alpha-value>)",
+        warn: "hsl(var(--warn) / <alpha-value>)",
+        bad: "hsl(var(--bad) / <alpha-value>)",
+        info: "hsl(var(--info) / <alpha-value>)",
+        chart: {
+          1: "hsl(var(--chart-1) / <alpha-value>)",
+          2: "hsl(var(--chart-2) / <alpha-value>)",
+          3: "hsl(var(--chart-3) / <alpha-value>)",
+          4: "hsl(var(--chart-4) / <alpha-value>)",
+          5: "hsl(var(--chart-5) / <alpha-value>)",
+        },
+      },
+      fontFamily: {
+        sans: ["var(--font-sans)"],
+        mono: ["var(--font-mono)"],
+        display: ["var(--font-display)"],
       },
       borderRadius: {
         lg: "var(--radius)",

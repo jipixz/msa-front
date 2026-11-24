@@ -40,7 +40,7 @@ export const PredictionCharts: React.FC<PredictionChartsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Thermometer className="h-5 w-5 text-orange-500" />
+              <Thermometer className="h-5 w-5 text-warn" />
               Predicción de Temperatura
               <Badge variant="outline" className="ml-auto text-xs">
                 7 días
@@ -53,21 +53,21 @@ export const PredictionCharts: React.FC<PredictionChartsProps> = ({
                 <LineChart data={temperatureData?.predictions || []}>
                   <XAxis dataKey="day" tickFormatter={formatDayLabel} />
                   <YAxis domain={[25, 40]} />
-                  <ReferenceLine y={OPTIMAL_TEMPERATURE} stroke="#10b981" strokeDasharray="5 5" label="Óptimo Cacao" />
+                  <ReferenceLine y={OPTIMAL_TEMPERATURE} stroke="hsl(var(--ok))" strokeDasharray="5 5" label="Óptimo Cacao" />
                   <Line
                     type="monotone"
                     dataKey="predicted"
-                    stroke="#f97316"
+                    stroke="hsl(var(--warn))"
                     strokeWidth={3}
                     strokeDasharray="5 5"
-                    dot={{ fill: "#f97316", r: 4 }}
+                    dot={{ fill: "hsl(var(--warn))", r: 4 }}
                   />
                   <Line
                     type="monotone"
                     dataKey="actual"
-                    stroke="#ef4444"
+                    stroke="hsl(var(--bad))"
                     strokeWidth={2}
-                    dot={{ fill: "#ef4444", r: 3 }}
+                    dot={{ fill: "hsl(var(--bad))", r: 3 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -79,7 +79,7 @@ export const PredictionCharts: React.FC<PredictionChartsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Droplets className="h-5 w-5 text-blue-500" />
+              <Droplets className="h-5 w-5 text-info" />
               Predicción de Humedad
               <Badge variant="outline" className="ml-auto text-xs">
                 7 días
@@ -92,12 +92,12 @@ export const PredictionCharts: React.FC<PredictionChartsProps> = ({
                 <AreaChart data={humidityData?.predictions || []}>
                   <XAxis dataKey="day" tickFormatter={formatDayLabel} />
                   <YAxis domain={[40, 100]} />
-                  <ReferenceLine y={OPTIMAL_HUMIDITY} stroke="#10b981" strokeDasharray="5 5" label="Óptimo Cacao" />
+                  <ReferenceLine y={OPTIMAL_HUMIDITY} stroke="hsl(var(--ok))" strokeDasharray="5 5" label="Óptimo Cacao" />
                   <Area
                     type="monotone"
                     dataKey="predicted"
-                    stroke="#3b82f6"
-                    fill="#3b82f6"
+                    stroke="hsl(var(--chart-1))"
+                    fill="hsl(var(--chart-1))"
                     fillOpacity={0.3}
                   />
                 </AreaChart>
@@ -116,7 +116,7 @@ export const PredictionCharts: React.FC<PredictionChartsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Thermometer className="h-5 w-5 text-orange-500" />
+              <Thermometer className="h-5 w-5 text-warn" />
               Temperatura Detallada
             </CardTitle>
           </CardHeader>
@@ -126,20 +126,20 @@ export const PredictionCharts: React.FC<PredictionChartsProps> = ({
                 <LineChart data={temperatureData?.predictions || []}>
                   <XAxis dataKey="day" tickFormatter={formatDayLabel} />
                   <YAxis domain={[20, 40]} />
-                  <ReferenceLine y={OPTIMAL_TEMPERATURE} stroke="#10b981" strokeDasharray="5 5" label="Óptimo Cacao" />
+                  <ReferenceLine y={OPTIMAL_TEMPERATURE} stroke="hsl(var(--ok))" strokeDasharray="5 5" label="Óptimo Cacao" />
                   <Line
                     type="monotone"
                     dataKey="predicted"
-                    stroke="#f97316"
+                    stroke="hsl(var(--warn))"
                     strokeWidth={3}
-                    dot={{ fill: "#f97316", r: 4 }}
+                    dot={{ fill: "hsl(var(--warn))", r: 4 }}
                   />
                   <Line
                     type="monotone"
                     dataKey="actual"
-                    stroke="#ef4444"
+                    stroke="hsl(var(--bad))"
                     strokeWidth={2}
-                    dot={{ fill: "#ef4444", r: 3 }}
+                    dot={{ fill: "hsl(var(--bad))", r: 3 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -151,7 +151,7 @@ export const PredictionCharts: React.FC<PredictionChartsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CloudRain className="h-5 w-5 text-cyan-500" />
+              <CloudRain className="h-5 w-5 text-info" />
               Predicción de Lluvia
             </CardTitle>
           </CardHeader>
@@ -161,8 +161,8 @@ export const PredictionCharts: React.FC<PredictionChartsProps> = ({
                 <BarChart data={rainfallData?.predictions || []}>
                   <XAxis dataKey="day" tickFormatter={formatDayLabel} />
                   <YAxis />
-                  <Bar dataKey="predicted" fill="#06b6d4" />
-                  <Bar dataKey="probability" fill="#0891b2" fillOpacity={0.6} />
+                  <Bar dataKey="predicted" fill="hsl(var(--info))" />
+                  <Bar dataKey="probability" fill="hsl(var(--info))" fillOpacity={0.6} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -177,7 +177,7 @@ export const PredictionCharts: React.FC<PredictionChartsProps> = ({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Leaf className="h-5 w-5 text-green-500" />
+            <Leaf className="h-5 w-5 text-ok" />
             Humedad del Suelo
           </CardTitle>
         </CardHeader>
@@ -187,20 +187,20 @@ export const PredictionCharts: React.FC<PredictionChartsProps> = ({
               <LineChart data={soilMoistureData?.predictions || []}>
                 <XAxis dataKey="day" tickFormatter={formatDayLabel} />
                 <YAxis domain={[20, 80]} />
-                <ReferenceLine y={OPTIMAL_SOIL_MOISTURE} stroke="#10b981" strokeDasharray="5 5" label="Óptimo Cacao" />
+                <ReferenceLine y={OPTIMAL_SOIL_MOISTURE} stroke="hsl(var(--ok))" strokeDasharray="5 5" label="Óptimo Cacao" />
                 <Line
                   type="monotone"
                   dataKey="predicted"
-                  stroke="#22c55e"
+                  stroke="hsl(var(--ok))"
                   strokeWidth={3}
-                  dot={{ fill: "#22c55e", r: 4 }}
+                  dot={{ fill: "hsl(var(--ok))", r: 4 }}
                 />
                 <Line
                   type="monotone"
                   dataKey="actual"
-                  stroke="#16a34a"
+                  stroke="hsl(var(--ok))"
                   strokeWidth={2}
-                  dot={{ fill: "#16a34a", r: 3 }}
+                  dot={{ fill: "hsl(var(--ok))", r: 3 }}
                 />
               </LineChart>
             </ResponsiveContainer>

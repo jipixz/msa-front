@@ -54,15 +54,15 @@ export function SensorDashboard() {
       description: "Porcentaje de humedad en el suelo",
       dataKey: "humedadSuelo",
       unit: "%",
-      color: "#3b82f6", // Azul
+      color: "hsl(var(--chart-1))", // Azul
       domain: [0, 100],
       chartType: 'area',
       status: (value) => {
         if (value === null) return { color: "gray", text: "Sin datos" }
-        if (value < 30) return { color: "#ef4444", text: "Muy seco" }
-        if (value < 50) return { color: "#f97316", text: "Seco" }
-        if (value < 70) return { color: "#22c55e", text: "Óptimo" }
-        return { color: "#3b82f6", text: "Húmedo" }
+        if (value < 30) return { color: "hsl(var(--bad))", text: "Muy seco" }
+        if (value < 50) return { color: "hsl(var(--warn))", text: "Seco" }
+        if (value < 70) return { color: "hsl(var(--ok))", text: "Óptimo" }
+        return { color: "hsl(var(--chart-1))", text: "Húmedo" }
       }
     },
     {
@@ -70,15 +70,15 @@ export function SensorDashboard() {
       description: "Temperatura del sensor DS18B20",
       dataKey: "temperaturaDS",
       unit: "°C",
-      color: "#f97316", // Naranja
+      color: "hsl(var(--warn))", // Naranja
       domain: [0, 50],
       chartType: 'line',
       status: (value) => {
         if (value === null) return { color: "gray", text: "Sin datos" }
-        if (value < 15) return { color: "#3b82f6", text: "Frío" }
-        if (value < 25) return { color: "#22c55e", text: "Óptimo" }
-        if (value < 35) return { color: "#f97316", text: "Caluroso" }
-        return { color: "#ef4444", text: "Muy caluroso" }
+        if (value < 15) return { color: "hsl(var(--chart-1))", text: "Frío" }
+        if (value < 25) return { color: "hsl(var(--ok))", text: "Óptimo" }
+        if (value < 35) return { color: "hsl(var(--warn))", text: "Caluroso" }
+        return { color: "hsl(var(--bad))", text: "Muy caluroso" }
       }
     },
     {
@@ -86,15 +86,15 @@ export function SensorDashboard() {
       description: "Temperatura del sensor BME280",
       dataKey: "temperaturaBME",
       unit: "°C",
-      color: "#ef4444", // Rojo
+      color: "hsl(var(--bad))", // Rojo
       domain: [0, 50],
       chartType: 'line',
       status: (value) => {
         if (value === null) return { color: "gray", text: "Sin datos" }
-        if (value < 15) return { color: "#3b82f6", text: "Frío" }
-        if (value < 25) return { color: "#22c55e", text: "Óptimo" }
-        if (value < 35) return { color: "#f97316", text: "Caluroso" }
-        return { color: "#ef4444", text: "Muy caluroso" }
+        if (value < 15) return { color: "hsl(var(--chart-1))", text: "Frío" }
+        if (value < 25) return { color: "hsl(var(--ok))", text: "Óptimo" }
+        if (value < 35) return { color: "hsl(var(--warn))", text: "Caluroso" }
+        return { color: "hsl(var(--bad))", text: "Muy caluroso" }
       }
     },
     {
@@ -102,7 +102,7 @@ export function SensorDashboard() {
       description: "Presión atmosférica en hPa",
       dataKey: "presion",
       unit: "hPa",
-      color: "#8b5cf6", // Púrpura
+      color: "hsl(var(--chart-4))", // Púrpura
       domain: [980, 1040],
       chartType: 'line'
     },
@@ -111,15 +111,15 @@ export function SensorDashboard() {
       description: "Porcentaje de humedad en el aire",
       dataKey: "humedadAire",
       unit: "%",
-      color: "#0ea5e9", // Celeste
+      color: "hsl(var(--info))", // Celeste
       domain: [0, 100],
       chartType: 'area',
       status: (value) => {
         if (value === null) return { color: "gray", text: "Sin datos" }
-        if (value < 30) return { color: "#ef4444", text: "Muy seco" }
-        if (value < 40) return { color: "#f97316", text: "Seco" }
-        if (value < 60) return { color: "#22c55e", text: "Óptimo" }
-        return { color: "#3b82f6", text: "Húmedo" }
+        if (value < 30) return { color: "hsl(var(--bad))", text: "Muy seco" }
+        if (value < 40) return { color: "hsl(var(--warn))", text: "Seco" }
+        if (value < 60) return { color: "hsl(var(--ok))", text: "Óptimo" }
+        return { color: "hsl(var(--chart-1))", text: "Húmedo" }
       }
     },
     {
@@ -127,7 +127,7 @@ export function SensorDashboard() {
       description: "Nivel de luz ambiental",
       dataKey: "luminosidad",
       unit: "",
-      color: "#eab308", // Amarillo
+      color: "hsl(var(--warn))", // Amarillo
       domain: [0, 10],
       chartType: 'bar'
     },
@@ -136,7 +136,7 @@ export function SensorDashboard() {
       description: "Detección de lluvia",
       dataKey: "lluvia",
       unit: "",
-      color: "#06b6d4", // Cian
+      color: "hsl(var(--info))", // Cian
       domain: [0, 1],
       chartType: 'bar'
     }
@@ -398,19 +398,19 @@ export function SensorDashboard() {
         <h2 className="text-3xl font-bold tracking-tight">{user ? `Hola, ${user.name || user.email}` : 'Panel de Sensores'}</h2>
         <div className="flex items-center space-x-2">
           {isConnected ? (
-            <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-sm font-medium text-green-800 dark:bg-green-900 dark:text-green-100">
-              <span className="mr-1 h-1.5 w-1.5 rounded-full bg-green-500"></span>
+            <span className="inline-flex items-center rounded-full bg-ok/10 px-2.5 py-0.5 text-sm font-medium text-ok">
+              <span className="mr-1 h-1.5 w-1.5 rounded-full bg-ok"></span>
               Conectado
             </span>
           ) : (
-            <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-sm font-medium text-red-800 dark:bg-red-900 dark:text-red-100">
-              <span className="mr-1 h-1.5 w-1.5 rounded-full bg-red-500"></span>
+            <span className="inline-flex items-center rounded-full bg-bad/10 px-2.5 py-0.5 text-sm font-medium text-bad">
+              <span className="mr-1 h-1.5 w-1.5 rounded-full bg-bad"></span>
               Desconectado {connectionError ? `(${connectionError})` : ''}
             </span>
           )}
           {isDataStale && isConnected && (
-            <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-sm font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
-              <span className="mr-1 h-1.5 w-1.5 rounded-full bg-yellow-500"></span>
+            <span className="inline-flex items-center rounded-full bg-warn/10 px-2.5 py-0.5 text-sm font-medium text-warn">
+              <span className="mr-1 h-1.5 w-1.5 rounded-full bg-warn"></span>
               Sin lecturas nuevas
             </span>
           )}

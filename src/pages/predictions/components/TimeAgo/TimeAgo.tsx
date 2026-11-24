@@ -6,7 +6,7 @@ interface TimeAgoProps {
   className?: string
 }
 
-export const TimeAgo: React.FC<TimeAgoProps> = ({ date, className = "text-xs text-gray-500" }) => {
+export const TimeAgo: React.FC<TimeAgoProps> = ({ date, className = "text-xs text-muted-foreground" }) => {
   const timeAgoText = useTimeAgo(date)
   
   if (!date || !timeAgoText) return null

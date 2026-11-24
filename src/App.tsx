@@ -4,6 +4,7 @@ import './App.css'
 import { ThemeProvider } from "@/components/theme-provider"
 import { Layout } from "@/components/layout"
 import { SensorDashboard } from "@/components/sensor-dashboard"
+import PanelFinca from "@/panel/PanelFinca"
 import Navigation from "@/components/navigation"
 import PredictionsPage from "@/pages/predictions/predictions"
 import ProductionPage from "@/pages/production/production"
@@ -16,7 +17,7 @@ import { RequireAdmin, RequireAuth, PublicOnly } from "@/components/RequireAuth"
 
 function App() {
   useEffect(() => {
-    document.title = "Sistema de Monitoreo Ambiental"
+    document.title = "AgroMonitor"
   }, [])
 
   return (
@@ -30,7 +31,8 @@ function App() {
             <Route path="/forgot" element={<PublicOnly><ForgotPasswordPage /></PublicOnly>} />
             <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
             <Route path="/admin/notifier" element={<RequireAdmin><NotifierAdminPage /></RequireAdmin>} />
-            <Route path="/" element={<RequireAuth><SensorDashboard /></RequireAuth>} />
+            <Route path="/" element={<RequireAuth><PanelFinca /></RequireAuth>} />
+            <Route path="/graficas" element={<RequireAuth><SensorDashboard /></RequireAuth>} />
             <Route path="/predictions" element={<RequireAuth><PredictionsPage /></RequireAuth>} />
             <Route path="/production" element={<RequireAuth><ProductionPage /></RequireAuth>} />
           </Routes>

@@ -28,7 +28,14 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
+    --radius: 0.5rem;
+    --ok: 152 58% 52%;
+    --warn: 30 100% 68%;
+    --bad: 0 100% 74%;
+    --info: 201 100% 68%;
+    --font-sans: 'Open Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --font-display: var(--font-sans)
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -76,6 +83,6 @@
     padding: 0 !important;
     max-width: none !important;
     width: 100vw !important;
-    height: 100vh !important;
+    min-height: 100vh;
   }
 }

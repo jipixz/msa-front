@@ -109,10 +109,10 @@ export function HumidityChart() {
   // Determinar el color y mensaje basado en el nivel de humedad
   const getHumidityStatus = () => {
     if (currentValue === null) return { color: "gray", text: "Sin datos" }
-    if (currentValue < 30) return { color: "#ef4444", text: "Muy seco" }
-    if (currentValue < 50) return { color: "#f97316", text: "Seco" }
-    if (currentValue < 70) return { color: "#22c55e", text: "Óptimo" }
-    return { color: "#3b82f6", text: "Húmedo" }
+    if (currentValue < 30) return { color: "hsl(var(--bad))", text: "Muy seco" }
+    if (currentValue < 50) return { color: "hsl(var(--warn))", text: "Seco" }
+    if (currentValue < 70) return { color: "hsl(var(--ok))", text: "Óptimo" }
+    return { color: "hsl(var(--chart-1))", text: "Húmedo" }
   }
 
   const status = getHumidityStatus()
@@ -125,19 +125,19 @@ export function HumidityChart() {
           <CardDescription>
             Lecturas de humedad en tiempo real
             {isConnected ? (
-              <span className="ml-2 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-100">
-                <span className="mr-1 h-1.5 w-1.5 rounded-full bg-green-500"></span>
+              <span className="ml-2 inline-flex items-center rounded-full bg-ok/10 px-2.5 py-0.5 text-xs font-medium text-ok">
+                <span className="mr-1 h-1.5 w-1.5 rounded-full bg-ok"></span>
                 Conectado
               </span>
             ) : (
-              <span className="ml-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-100">
-                <span className="mr-1 h-1.5 w-1.5 rounded-full bg-red-500"></span>
+              <span className="ml-2 inline-flex items-center rounded-full bg-bad/10 px-2.5 py-0.5 text-xs font-medium text-bad">
+                <span className="mr-1 h-1.5 w-1.5 rounded-full bg-bad"></span>
                 Desconectado {connectionError ? `(${connectionError})` : ''}
               </span>
             )}
             {isDataStale && isConnected && (
-              <span className="ml-2 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
-                <span className="mr-1 h-1.5 w-1.5 rounded-full bg-yellow-500"></span>
+              <span className="ml-2 inline-flex items-center rounded-full bg-warn/10 px-2.5 py-0.5 text-xs font-medium text-warn">
+                <span className="mr-1 h-1.5 w-1.5 rounded-full bg-warn"></span>
                 Sin lecturas nuevas
               </span>
             )}
