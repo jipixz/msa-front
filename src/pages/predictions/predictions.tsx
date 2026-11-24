@@ -50,7 +50,7 @@ interface AlertsData {
 }
 
 // Configuración de la API
-const API_BASE_URL = "http://localhost:23457"
+const API_BASE_URL = import.meta.env.VITE_PREDICTIONS_API_URL || "http://localhost:23457"
 
 // Constantes para valores óptimos
 const OPTIMAL_TEMPERATURE = 28 // Temperatura óptima para cacao en °C
