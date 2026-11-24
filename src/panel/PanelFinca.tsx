@@ -1,6 +1,7 @@
 // Panel de la finca: el estilo activo decide el acomodo (src/estilos/registro.ts → acomodo).
 import type { ReactNode } from "react"
 import { useTheme } from "@/components/theme-provider"
+import { useAuthStore } from "@/lib/auth-store"
 import type { Acomodo } from "@/estilos/registro"
 import { usePanel, type DatosPanel } from "./usePanel"
 import {
@@ -204,7 +205,7 @@ export const ACOMODOS: Record<Acomodo, (d: DatosPanel) => ReactNode> = {
     </>
   ),
   lcd: (d) => (
-    <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-inner">
+    <div className="flex flex-col gap-6 rounded-xl border border-border bg-card p-6 shadow-inner">
       <div className="flex flex-wrap items-center gap-3 tracking-widest"><b>AGROMONITOR</b><span className="text-muted-foreground">ESTACIÓN DE CAMPO</span><span className="ml-auto"><EstadoConexion d={d} /></span></div>
       <Fila>
         <div className="flex-[2_1_420px] rounded-md border-4 border-background bg-secondary p-4"><NumeroGrande d={d} /><SerieHumedad d={d} alto={120} /></div>
@@ -227,11 +228,13 @@ export const ACOMODOS: Record<Acomodo, (d: DatosPanel) => ReactNode> = {
 
 export default function PanelFinca() {
   const { estilo } = useTheme()
+  const { user } = useAuthStore()
   const d = usePanel()
   return (
-    <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-5 px-4 py-6 sm:px-6" data-acomodo={estilo.acomodo}>
+    <div className="flex w-full flex-col gap-5 px-4 py-6 text-left sm:px-8" data-acomodo={estilo.acomodo}>
+      {user && <p className="text-lg font-semibold">Hola, {user.name || user.email}</p>}
       {d.error && <p role="alert" className="rounded-lg border border-bad p-3 text-sm text-bad">{d.error}. Se muestran los últimos datos disponibles.</p>}
-      {d.cargando ? <p className="text-muted-foreground">Cargando datos de la finca…</p> : ACOMODOS[estilo.acomodo](d)}
+      {d.cargando ? <p role="status" className="flex min-h-[60vh] items-center justify-center text-muted-foreground">Cargando datos de la finca…</p> : ACOMODOS[estilo.acomodo](d)}
       <EnlaceGraficas />
     </div>
   )

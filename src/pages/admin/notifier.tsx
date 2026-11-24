@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
-import { api } from "@/lib/api"
+import { api, mensajeError } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -79,10 +79,10 @@ type LogEntry = {
   _id: string
   ruleId?: string
   ruleName: string
-  reading: any
+  reading: Record<string, unknown>
   message: RuleMessage
   channels: string[]
-  results: any
+  results: unknown
   triggeredAt: string
 }
 
@@ -222,8 +222,8 @@ export default function NotifierAdminPage() {
     if (!editing) return
     setLoading(true)
     try {
-      const payload = { ...editing }
-      delete (payload as any)._id
+      const payload: Partial<typeof editing> = { ...editing }
+      delete payload._id
       if (editing._id) {
         await api.put(`/api/notifier/rules/${editing._id}`, payload)
       } else {
@@ -231,8 +231,8 @@ export default function NotifierAdminPage() {
       }
       setEditing(null)
       await loadRules()
-    } catch (e: any) {
-      alert("Error guardando: " + (e?.response?.data?.message || e.message))
+    } catch (e) {
+      alert("Error guardando: " + mensajeError(e))
     } finally {
       setLoading(false)
     }
@@ -247,8 +247,8 @@ export default function NotifierAdminPage() {
         body: testBody,
       })
       setTestResult(JSON.stringify(data.results, null, 2))
-    } catch (e: any) {
-      setTestResult("Error: " + (e?.response?.data?.message || e.message))
+    } catch (e) {
+      setTestResult("Error: " + mensajeError(e))
     }
   }
 
@@ -404,7 +404,7 @@ export default function NotifierAdminPage() {
                       </Badge>
                     ))}
                     {l.reading?.nodo !== undefined && (
-                      <Badge variant="outline">Nodo {l.reading.nodo}</Badge>
+                      <Badge variant="outline">Nodo {String(l.reading.nodo)}</Badge>
                     )}
                   </div>
                 </div>

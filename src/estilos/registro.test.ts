@@ -75,3 +75,37 @@ describe("contraste WCAG por estilo y variante", () => {
     }
   }
 })
+
+describe("personalización: todo lo elegible se lee", () => {
+  it("cualquier estilo × variante × fondo × acento cumple contraste", async () => {
+    const { FONDOS, ACENTOS_SUGERIDOS, aplicarPersonalizacion } = await import("./registro")
+    const fondos = ["estilo", ...FONDOS.map((f) => f.id)] as const
+    const fallas: string[] = []
+    let combinaciones = 0
+    for (const e of ESTILOS) for (const v of e.variantes) for (const fondo of fondos) for (const acento of [null, ...ACENTOS_SUGERIDOS]) {
+      const p = aplicarPersonalizacion(e, v, { fondo, acento, acento2: acento })
+      combinaciones++
+      const req: [string, string, string, number][] = [
+        ["texto/fondo", p.texto, p.fondo, 4.5], ["texto2/superficie", p.texto2, p.superficie, 4.5],
+        ["acento/superficie", p.acento, p.superficie, 3], ["sobreAcento/acento", p.textoSobreAcento, p.acento, 4.5],
+        ["ok", p.ok, p.superficie, 4.5], ["warn", p.warn, p.superficie, 4.5], ["bad", p.bad, p.superficie, 4.5], ["info", p.info, p.superficie, 4.5],
+      ]
+      for (const [n, a, b, min] of req) if (contraste(a, b) < min) fallas.push(`${e.id}/${v.id}/${fondo}/${acento}: ${n} ${contraste(a, b).toFixed(2)}`)
+    }
+    expect(combinaciones).toBeGreaterThan(4000) // 42 variantes × 7 fondos × 15 acentos
+    expect(fallas.slice(0, 10)).toEqual([])
+  })
+
+  it("sin personalizar devuelve la paleta original del estilo", async () => {
+    const { aplicarPersonalizacion, SIN_PERSONALIZAR } = await import("./registro")
+    const e = ESTILOS[5]
+    expect(aplicarPersonalizacion(e, e.variantes[0], SIN_PERSONALIZAR)).toBe(e.variantes[0].paleta)
+  })
+
+  it("un acento ilegible se ajusta (amarillo sobre fondo claro)", async () => {
+    const { aplicarPersonalizacion } = await import("./registro")
+    const p = aplicarPersonalizacion(ESTILOS[0], ESTILOS[0].variantes[0], { fondo: "claro", acento: "#ffe600", acento2: null })
+    expect(p.acento).not.toBe("#ffe600")
+    expect(contraste(p.acento, p.superficie)).toBeGreaterThanOrEqual(3)
+  })
+})

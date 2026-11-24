@@ -244,6 +244,7 @@ export const ESTILOS: Estilo[] = [
     radio: "0px", efectos: ["scanlines", "mayusculas"],
     variantes: [
       { id: "mision", nombre: "Misión", paleta: { oscuro: true, fondo: "#050b14", superficie: "#08121f", superficie2: "#0c1a2c", borde: "#1f3a57", texto: "#cfe8ff", texto2: "#8fb0cf", acento: "#4fd8ff", textoSobreAcento: "#050b14", ok: "#7cf29c", warn: "#ffb547", bad: "#ff5c5c", info: "#b39cff", series: ["#4fd8ff", "#7cf29c", "#ffb547", "#b39cff", "#ff5c5c"] } },
+      { id: "dia", nombre: "Turno de día", paleta: { oscuro: false, fondo: "#eef3f8", superficie: "#ffffff", superficie2: "#e3ebf3", borde: "#9fb3c8", texto: "#0b1a2b", texto2: "#3d5470", acento: "#006a9e", textoSobreAcento: "#ffffff", ok: "#157a3b", warn: "#9a5b00", bad: "#b3261e", info: "#5b3fbf", series: ["#006a9e", "#157a3b", "#9a5b00", "#5b3fbf", "#b3261e"] } },
     ],
   },
   {
@@ -300,8 +301,8 @@ export function hexAHsl(hex: string): string {
 }
 
 /** Variables CSS que aplica un estilo/variante sobre :root. */
-export function variablesCss(estilo: Estilo, variante: Variante): Record<string, string> {
-  const p = variante.paleta
+export function variablesCss(estilo: Estilo, variante: Variante, personalizacion?: Personalizacion | null): Record<string, string> {
+  const p = aplicarPersonalizacion(estilo, variante, personalizacion)
   const v: Record<string, string> = {
     "--background": hexAHsl(p.fondo),
     "--foreground": hexAHsl(p.texto),
@@ -333,4 +334,96 @@ export function variablesCss(estilo: Estilo, variante: Variante): Record<string,
   }
   p.series.forEach((c, i) => { v[`--chart-${i + 1}`] = hexAHsl(c) })
   return v
+}
+
+// ---------------------------------------------------------------------------------------
+// Personalización por estilo (como los temas de Pixel): fondo y colores de acento.
+
+export type FondoId = "estilo" | "oled" | "oscuro-gris" | "oscuro-azulino" | "oscuro-sepia" | "sepia-claro" | "claro"
+
+type Fondo = Pick<Paleta, "oscuro" | "fondo" | "superficie" | "superficie2" | "borde" | "texto" | "texto2">
+
+export const FONDOS: { id: Exclude<FondoId, "estilo">; nombre: string; colores: Fondo }[] = [
+  { id: "oled", nombre: "OLED", colores: { oscuro: true, fondo: "#000000", superficie: "#0a0a0a", superficie2: "#161616", borde: "#262626", texto: "#f5f5f5", texto2: "#a8a8a8" } },
+  { id: "oscuro-gris", nombre: "Oscuro", colores: { oscuro: true, fondo: "#0f1011", superficie: "#17181a", superficie2: "#202124", borde: "#2e3033", texto: "#ededef", texto2: "#a0a0a8" } },
+  { id: "oscuro-azulino", nombre: "Oscuro azulino", colores: { oscuro: true, fondo: "#070F14", superficie: "#0A141A", superficie2: "#16252F", borde: "#243440", texto: "#F0F4F7", texto2: "#A9B5C0" } },
+  { id: "oscuro-sepia", nombre: "Oscuro sepia", colores: { oscuro: true, fondo: "#14100A", superficie: "#1B1610", superficie2: "#292218", borde: "#3A3020", texto: "#EDE3D0", texto2: "#C7B99D" } },
+  { id: "sepia-claro", nombre: "Sepia claro", colores: { oscuro: false, fondo: "#E7DECB", superficie: "#EFE8D8", superficie2: "#DAD0B9", borde: "#C4B79C", texto: "#2B2215", texto2: "#584B31" } },
+  { id: "claro", nombre: "Claro", colores: { oscuro: false, fondo: "#F2F4F6", superficie: "#FFFFFF", superficie2: "#F1F3F5", borde: "#DCE1E6", texto: "#0F1B23", texto2: "#4A5763" } },
+]
+
+/** Acentos sugeridos (al estilo de la paleta de Pixel). */
+export const ACENTOS_SUGERIDOS = [
+  "#31adff", "#4493f8", "#7c86ff", "#b388ff", "#e872ff", "#ff2bd6", "#ff5f6d",
+  "#ff5f1f", "#ffb000", "#ffe600", "#a3e635", "#3ccf8e", "#00f0ff", "#4dd4c6",
+]
+
+export type Personalizacion = { fondo: FondoId; acento: string | null; acento2: string | null }
+export const SIN_PERSONALIZAR: Personalizacion = { fondo: "estilo", acento: null, acento2: null }
+
+const ESTADOS_OSCURO = { ok: "#3ccf8e", warn: "#ffab5c", bad: "#ff7b7b", info: "#5CBEFF" }
+const ESTADOS_CLARO = { ok: "#13794a", warn: "#a65400", bad: "#b3261e", info: "#0052a8" }
+
+function luminanciaHex(hex: string) {
+  const c = hex.replace("#", "").match(/.{2}/g)!.map((x) => parseInt(x, 16) / 255)
+    .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+}
+
+export function contraste(a: string, b: string) {
+  const [x, y] = [luminanciaHex(a), luminanciaHex(b)].sort((m, n) => n - m)
+  return (x + 0.05) / (y + 0.05)
+}
+
+function mezclar(hex: string, hacia: string, t: number) {
+  const a = hex.replace("#", "").match(/.{2}/g)!.map((x) => parseInt(x, 16))
+  const b = hacia.replace("#", "").match(/.{2}/g)!.map((x) => parseInt(x, 16))
+  return "#" + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, "0")).join("")
+}
+
+/** Aclara u oscurece un color (mezclándolo con blanco o negro) hasta que contraste lo pedido con el fondo. */
+export function ajustarContraste(color: string, fondo: string, minimo: number) {
+  if (contraste(color, fondo) >= minimo) return color
+  const hacia = luminanciaHex(fondo) < 0.18 ? "#ffffff" : "#000000"
+  for (let t = 0.05; t <= 1; t += 0.05) {
+    const c = mezclar(color, hacia, t)
+    if (contraste(c, fondo) >= minimo) return c
+  }
+  return hacia
+}
+
+const esHex = (c: string | null | undefined): c is string => !!c && /^#[0-9a-fA-F]{6}$/.test(c)
+
+/** Paleta final de un estilo/variante con la personalización del usuario aplicada. */
+export function aplicarPersonalizacion(estilo: Estilo, variante: Variante, per?: Personalizacion | null): Paleta {
+  const base = variante.paleta
+  if (!per || (per.fondo === "estilo" && !esHex(per.acento) && !esHex(per.acento2))) return base
+  const p: Paleta = { ...base, series: [...base.series] as Paleta["series"] }
+
+  const fondo = FONDOS.find((f) => f.id === per.fondo)
+  if (fondo) {
+    Object.assign(p, fondo.colores)
+    if (fondo.colores.oscuro !== base.oscuro) {
+      // Cambió el brillo: los estados salen de la variante del estilo con ese brillo (o los genéricos)
+      const otra = estilo.variantes.find((v) => v.paleta.oscuro === fondo.colores.oscuro)?.paleta
+      const estados = otra ?? (fondo.colores.oscuro ? ESTADOS_OSCURO : ESTADOS_CLARO)
+      Object.assign(p, { ok: estados.ok, warn: estados.warn, bad: estados.bad, info: estados.info })
+      if (otra) { p.acento = otra.acento; p.textoSobreAcento = otra.textoSobreAcento; p.series = [...otra.series] as Paleta["series"] }
+    }
+    // Garantiza que los estados se lean sobre el fondo nuevo
+    for (const k of ["ok", "warn", "bad", "info"] as const) p[k] = ajustarContraste(p[k], p.superficie, 4.5)
+    if (contraste(p.acento, p.superficie) < 3) p.acento = ajustarContraste(p.acento, p.superficie, 3)
+  }
+
+  if (esHex(per.acento)) {
+    p.acento = ajustarContraste(per.acento, p.superficie, 3)
+    p.series[0] = p.acento
+  }
+  if (esHex(per.acento2)) {
+    p.info = ajustarContraste(per.acento2, p.superficie, 4.5)
+    p.series[1] = p.info
+  }
+  // Texto sobre el acento: negro o blanco, el que más contraste
+  p.textoSobreAcento = contraste(p.acento, "#000000") >= contraste(p.acento, "#ffffff") ? "#000000" : "#ffffff"
+  return p
 }

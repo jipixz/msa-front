@@ -44,7 +44,7 @@ export function initNotifications(backUrl: string) {
   socket = io(backUrl, { transports: ['websocket'], withCredentials: true })
 
   // Lecturas en vivo (informativo)
-  socket.on('nueva-lectura', (payload: any) => {
+  socket.on('nueva-lectura', (payload: { humedadSuelo?: number; temperaturaBME?: number }) => {
     pushNotification({
       id: `r-${Date.now()}`,
       kind: 'reading',
@@ -56,7 +56,7 @@ export function initNotifications(backUrl: string) {
   })
 
   // Alertas disparadas por el sistema de reglas (notifier)
-  socket.on('notifier-alert', (payload: any) => {
+  socket.on('notifier-alert', (payload: { ruleId?: string; ruleName?: string; triggeredAt?: string; message?: { title?: string; body?: string; priority?: string } }) => {
     pushNotification({
       id: `a-${payload?.ruleId || Date.now()}-${Date.now()}`,
       kind: 'alert',

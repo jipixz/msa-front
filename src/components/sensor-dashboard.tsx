@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { RANGOS, enRango, haceCuanto, type CampoNumerico } from "@/panel/datos"
 import { io } from "socket.io-client"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, LineChart, Line } from "recharts"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { useAuthStore } from "@/lib/auth-store"
 import { Bell } from "lucide-react"
 import { API_URL, apiFetch } from "@/lib/api"
 
@@ -40,8 +40,16 @@ type ChartConfig = {
 }
 
 export function SensorDashboard() {
-  const { user } = useAuthStore()
   const [data, setData] = useState<SensorData[]>([])
+  // Para graficar, los valores fuera del rango físico se vuelven null (hueco en vez de un pico de 700 %)
+  const datosGrafica = useMemo(() => data.map((d) => {
+    const limpio: Record<string, unknown> = { ...d }
+    for (const campo of Object.keys(RANGOS) as CampoNumerico[]) {
+      const v = limpio[campo]
+      if (v !== undefined && v !== null && !enRango(campo, v)) limpio[campo] = null
+    }
+    return limpio as SensorData
+  }), [data])
   const [currentData, setCurrentData] = useState<SensorData | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const [connectionError, setConnectionError] = useState<string | null>(null)
@@ -225,28 +233,24 @@ export function SensorDashboard() {
 
   // Renderizar una gráfica individual basada en la configuración
   const renderChart = (config: ChartConfig) => {
-    const value = currentData ? currentData[config.dataKey] : null;
-    const status = config.status ? config.status(value as number) : { color: config.color, text: "" };
+    const crudo = currentData ? currentData[config.dataKey] : null;
+    // Sin dato o fuera de rango físico (p. ej. 700 % de un ADC al aire) se muestra "—", nunca "°C · Muy caluroso"
+    const valido = typeof crudo === "number" && Number.isFinite(crudo) && (!(config.dataKey in RANGOS) || enRango(config.dataKey as CampoNumerico, crudo));
+    const value = valido ? (crudo as number) : null;
+    const status = value !== null && config.status ? config.status(value) : { color: config.color, text: "" };
 
     return (
       <Card className="overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div>
-            <CardTitle>{config.title}</CardTitle>
-            <CardDescription>{config.description}</CardDescription>
+        {/* Altura fija del encabezado: así todas las gráficas quedan alineadas entre tarjetas */}
+        <CardHeader className="flex min-h-[124px] flex-col items-center gap-1 pb-2 text-center">
+          <CardTitle>{config.title}</CardTitle>
+          <CardDescription>{config.description}</CardDescription>
+          <div className="mt-1 flex items-baseline justify-center gap-2">
+            <span className="font-mono text-2xl font-bold">{value === null ? "—" : `${value}${config.unit}`}</span>
+            <span className="text-sm font-medium" style={{ color: status.color }}>
+              {value === null ? (crudo === null || crudo === undefined ? "sin dato" : "lectura fuera de rango") : status.text}
+            </span>
           </div>
-          {value !== null && (
-            <div className="flex flex-col items-end">
-              <div className="text-2xl font-bold">
-                {value}{config.unit}
-              </div>
-              {status.text && (
-                <div className="text-sm font-medium" style={{ color: status.color }}>
-                  {status.text}
-                </div>
-              )}
-            </div>
-          )}
         </CardHeader>
         <CardContent className="pt-0">
           <div className="h-[200px]">
@@ -254,7 +258,7 @@ export function SensorDashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 {config.chartType === 'area' ? (
                   <AreaChart
-                    data={data}
+                    data={datosGrafica}
                     margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                   >
                     <defs>
@@ -301,7 +305,7 @@ export function SensorDashboard() {
                   </AreaChart>
                 ) : config.chartType === 'line' ? (
                   <LineChart
-                    data={data}
+                    data={datosGrafica}
                     margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -343,7 +347,7 @@ export function SensorDashboard() {
                   </LineChart>
                 ) : (
                   <BarChart
-                    data={data}
+                    data={datosGrafica}
                     margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -395,7 +399,15 @@ export function SensorDashboard() {
   return (
     <div className="w-full h-full space-y-4 overflow-auto p-4 px-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">{user ? `Hola, ${user.name || user.email}` : 'Panel de Sensores'}</h2>
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Gráficas por variable</h2>
+          <p className="text-sm text-muted-foreground">
+            {data.length
+              ? `${data.length} lecturas recientes de ${new Set(data.map((d) => (d as { nodo?: number }).nodo ?? 0)).size} nodo(s) · último dato ${haceCuanto(Math.round((Date.now() - Math.max(...data.map((d) => Date.parse(d.fecha) || 0))) / 60000))}`
+              : "Sin lecturas todavía"}
+            {" · "}valores imposibles (fuera de rango) se ocultan
+          </p>
+        </div>
         <div className="flex items-center space-x-2">
           {isConnected ? (
             <span className="inline-flex items-center rounded-full bg-ok/10 px-2.5 py-0.5 text-sm font-medium text-ok">
@@ -405,7 +417,7 @@ export function SensorDashboard() {
           ) : (
             <span className="inline-flex items-center rounded-full bg-bad/10 px-2.5 py-0.5 text-sm font-medium text-bad">
               <span className="mr-1 h-1.5 w-1.5 rounded-full bg-bad"></span>
-              Desconectado {connectionError ? `(${connectionError})` : ''}
+              <span title={connectionError ?? undefined}>Sin conexión en vivo</span>
             </span>
           )}
           {isDataStale && isConnected && (

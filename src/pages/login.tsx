@@ -8,7 +8,7 @@ import { useAuthStore } from "@/lib/auth-store"
 import { API_URL } from "@/lib/api"
 import { useNavigate } from "react-router-dom"
 
-export default function LoginForm({ /*className,  ...props */ }: React.ComponentProps<"div">) {
+export default function LoginForm() {
   const { login, loading, error } = useAuthStore()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")

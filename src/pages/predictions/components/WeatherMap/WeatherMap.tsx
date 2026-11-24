@@ -132,7 +132,7 @@ export const WeatherMap: React.FC = () => {
         </div>
 
         {/* Mapa */}
-        <div className="h-96 w-full rounded-lg overflow-hidden border border-border relative">
+        <div className="h-96 w-full rounded-lg overflow-hidden border border-border relative isolate z-0">
           <MapContainer
             center={[CERRO_BLANCO_COORDS.lat, CERRO_BLANCO_COORDS.lng]}
             zoom={12}
@@ -247,7 +247,7 @@ export const WeatherMap: React.FC = () => {
         </div>
 
         {/* Leyenda */}
-        {Object.entries(activeWeatherTiles).some(([_, isActive]) => isActive) && (
+        {Object.values(activeWeatherTiles).some((isActive) => isActive) && (
           <div className="mt-4 p-3 bg-muted rounded-lg">
             <p className="text-xs text-foreground mb-2">
               <strong>Capas activas:</strong>

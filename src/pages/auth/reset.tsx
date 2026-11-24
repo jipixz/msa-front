@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { api } from "@/lib/api"
+import { api, mensajeError } from "@/lib/api"
 
 export default function ResetPasswordPage() {
   const [params] = useSearchParams()
@@ -24,8 +24,8 @@ export default function ResetPasswordPage() {
       await api.post('/auth/reset', { token, password })
       setDone(true)
       setTimeout(() => navigate('/', { replace: true }), 1200)
-    } catch (e: any) {
-      setError(e?.response?.data?.message || 'No se pudo restablecer la contraseña')
+    } catch (e) {
+      setError(mensajeError(e, 'No se pudo restablecer la contraseña'))
     }
   }
 

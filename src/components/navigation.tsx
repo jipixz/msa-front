@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { Logo } from "@/components/logo"
 import { SelectorEstilo } from "@/estilos/SelectorEstilo"
-import { Home, TrendingUp, Database, User, Bell, Menu, X, Leaf, LogOut, Lock, Shield, LineChart } from "lucide-react"
+import { Home, TrendingUp, Database, User, Bell, Menu, X, LogOut, Lock, Shield, LineChart } from "lucide-react"
 import { useAuthStore } from "@/lib/auth-store"
 import { useNotificationsStore, initNotifications } from "@/lib/notifications-store"
 import { API_URL } from "@/lib/api"
@@ -55,8 +56,8 @@ export default function Navigation() {
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="p-2 bg-ok/10 rounded-lg">
-                <Leaf className="h-6 w-6 text-ok" />
+              <div className="rounded-lg border border-border p-1.5 text-primary">
+                <Logo className="h-7 w-7" />
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg font-semibold text-foreground">AgroMonitor</h1>

@@ -17,7 +17,8 @@ export default function ForgotPasswordPage() {
     try {
       await api.post('/auth/forgot', { email })
       setSent(true)
-    } catch (e: any) {
+    } catch {
+      // Por seguridad se responde igual exista o no la cuenta
       setSent(true)
     }
   }

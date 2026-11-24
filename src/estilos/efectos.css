@@ -1,15 +1,20 @@
-/* Efectos visuales por estilo. Se activan con <html data-efectos="..."> (ver registro.ts).
-   Todos usan las variables del estilo activo, así que funcionan en cualquier variante. */
+/* Efectos visuales por estilo.
+   - En la app: <html data-efectos="..."> (ver registro.ts y theme-provider.tsx).
+   - En la vista previa del selector: <div class="vista-estilo" data-efectos="..."> con sus
+     propias variables. Los efectos del <html> no se aplican dentro de .vista-estilo, así la
+     vista previa muestra solo los del estilo que se está previsualizando. */
 
 /* Números y datos siempre en la fuente mono del estilo */
 .font-mono, code, kbd, pre { font-family: var(--font-mono); }
 h1, h2, h3 { font-family: var(--font-display); }
 
 /* --- mono-total: toda la interfaz en monoespaciada (Termux, radar) --- */
-[data-efectos~="mono-total"] body { font-family: var(--font-mono); }
+html[data-efectos~="mono-total"] body,
+.vista-estilo[data-efectos~="mono-total"] { font-family: var(--font-mono); }
 
 /* --- reticula: cuadrícula de fondo (neón) --- */
-[data-efectos~="reticula"] body {
+html[data-efectos~="reticula"] body,
+.vista-estilo[data-efectos~="reticula"] {
   background-image:
     linear-gradient(hsl(var(--primary) / 0.06) 1px, transparent 1px),
     linear-gradient(90deg, hsl(var(--primary) / 0.06) 1px, transparent 1px);
@@ -17,7 +22,8 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 
 /* --- reticula-plano: doble cuadrícula de plano técnico --- */
-[data-efectos~="reticula-plano"] body {
+html[data-efectos~="reticula-plano"] body,
+.vista-estilo[data-efectos~="reticula-plano"] {
   background-image:
     linear-gradient(hsl(var(--foreground) / 0.14) 1px, transparent 1px),
     linear-gradient(90deg, hsl(var(--foreground) / 0.14) 1px, transparent 1px),
@@ -25,29 +31,30 @@ h1, h2, h3 { font-family: var(--font-display); }
     linear-gradient(90deg, hsl(var(--foreground) / 0.05) 1px, transparent 1px);
   background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
 }
-[data-efectos~="reticula-plano"] .bg-card { background-color: hsl(var(--card) / 0.85); border-style: dashed; }
+html[data-efectos~="reticula-plano"] .bg-card:not(.vista-estilo *),
+.vista-estilo[data-efectos~="reticula-plano"] .bg-card { background-color: hsl(var(--card) / 0.85); border-style: dashed; }
 
 /* --- brillo: resplandor neón en acentos, títulos y tarjetas --- */
-[data-efectos~="brillo"] h1,
-[data-efectos~="brillo"] h2,
-[data-efectos~="brillo"] .text-primary { text-shadow: 0 0 10px hsl(var(--primary) / 0.65); }
-[data-efectos~="brillo"] .bg-card { box-shadow: 0 0 14px hsl(var(--primary) / 0.22), inset 0 0 0 1px hsl(var(--primary) / 0.35); }
-[data-efectos~="brillo"] .bg-primary { box-shadow: 0 0 14px hsl(var(--primary) / 0.6); }
+html[data-efectos~="brillo"] :is(h1, h2, .text-primary):not(.vista-estilo *),
+.vista-estilo[data-efectos~="brillo"] :is(h1, h2, .text-primary) { text-shadow: 0 0 10px hsl(var(--primary) / 0.65); }
+html[data-efectos~="brillo"] .bg-card:not(.vista-estilo *),
+.vista-estilo[data-efectos~="brillo"] .bg-card { box-shadow: 0 0 14px hsl(var(--primary) / 0.22), inset 0 0 0 1px hsl(var(--primary) / 0.35); }
+html[data-efectos~="brillo"] .bg-primary:not(.vista-estilo *),
+.vista-estilo[data-efectos~="brillo"] .bg-primary { box-shadow: 0 0 14px hsl(var(--primary) / 0.6); }
 
 /* --- esquinas-cortadas: tarjetas con chaflán --- */
-[data-efectos~="esquinas-cortadas"] .bg-card {
+html[data-efectos~="esquinas-cortadas"] .bg-card:not(.vista-estilo *),
+.vista-estilo[data-efectos~="esquinas-cortadas"] .bg-card {
   clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
 }
 
 /* --- mayusculas: títulos, navegación y botones en mayúsculas espaciadas --- */
-[data-efectos~="mayusculas"] h1,
-[data-efectos~="mayusculas"] h2,
-[data-efectos~="mayusculas"] h3,
-[data-efectos~="mayusculas"] nav a,
-[data-efectos~="mayusculas"] button { text-transform: uppercase; letter-spacing: 0.06em; }
+html[data-efectos~="mayusculas"] :is(h1, h2, h3, nav a, button):not(.vista-estilo *),
+.vista-estilo[data-efectos~="mayusculas"] :is(h1, h2, h3, nav a, button) { text-transform: uppercase; letter-spacing: 0.06em; }
 
 /* --- scanlines: líneas de escaneo sobre toda la pantalla (centro de control) --- */
-[data-efectos~="scanlines"] body::after {
+html[data-efectos~="scanlines"] body::after,
+.vista-estilo[data-efectos~="scanlines"]::after {
   content: "";
   position: fixed;
   inset: 0;
@@ -55,26 +62,41 @@ h1, h2, h3 { font-family: var(--font-display); }
   z-index: 60;
   background: repeating-linear-gradient(0deg, hsl(var(--foreground) / 0.035) 0 1px, transparent 1px 3px);
 }
+.vista-estilo[data-efectos~="scanlines"]::after { position: absolute; z-index: 1; }
 
 /* --- brutal: bordes gruesos, sombras duras, títulos enormes --- */
-[data-efectos~="brutal"] .bg-card,
-[data-efectos~="brutal"] button,
-[data-efectos~="brutal"] input,
-[data-efectos~="brutal"] select { border-width: 3px; border-color: hsl(var(--foreground)); }
-[data-efectos~="brutal"] .bg-card { box-shadow: 6px 6px 0 hsl(var(--foreground)); }
-[data-efectos~="brutal"] h1, [data-efectos~="brutal"] h2 { font-weight: 900; }
+html[data-efectos~="brutal"] :is(.bg-card, button, input, select):not(.vista-estilo *),
+.vista-estilo[data-efectos~="brutal"] :is(.bg-card, button, input, select) { border-width: 3px; border-color: hsl(var(--foreground)); }
+html[data-efectos~="brutal"] .bg-card:not(.vista-estilo *),
+.vista-estilo[data-efectos~="brutal"] .bg-card { box-shadow: 6px 6px 0 hsl(var(--foreground)); }
+html[data-efectos~="brutal"] :is(h1, h2):not(.vista-estilo *),
+.vista-estilo[data-efectos~="brutal"] :is(h1, h2) { font-weight: 900; }
 
 /* --- filetes: estilo suizo, sin sombras ni fondos de tarjeta --- */
-[data-efectos~="filetes"] .bg-card { box-shadow: none; border-width: 0; border-top: 2px solid hsl(var(--foreground)); }
+html[data-efectos~="filetes"] .bg-card:not(.vista-estilo *),
+.vista-estilo[data-efectos~="filetes"] .bg-card { box-shadow: none; border-width: 0; border-top: 2px solid hsl(var(--foreground)); }
 
 /* --- periodico: titulares en serif display --- */
-[data-efectos~="periodico"] h1, [data-efectos~="periodico"] h2 { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.01em; }
+html[data-efectos~="periodico"] :is(h1, h2):not(.vista-estilo *),
+.vista-estilo[data-efectos~="periodico"] :is(h1, h2) { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.01em; }
 
 /* --- fosforo: brillo suave de pantalla de fósforo en todo el texto --- */
-[data-efectos~="fosforo"] body { text-shadow: 0 0 3px hsl(var(--foreground) / 0.55); }
+html[data-efectos~="fosforo"] body,
+.vista-estilo[data-efectos~="fosforo"] { text-shadow: 0 0 3px hsl(var(--foreground) / 0.55); }
 
 /* --- sin-color: e-ink; gráficas en escala de grises --- */
-[data-efectos~="sin-color"] svg, [data-efectos~="sin-color"] img, [data-efectos~="sin-color"] canvas { filter: grayscale(1) contrast(1.1); }
+html[data-efectos~="sin-color"] :is(svg, img, canvas):not(.vista-estilo *),
+.vista-estilo[data-efectos~="sin-color"] :is(svg, img, canvas) { filter: grayscale(1) contrast(1.1); }
 
 /* --- pantallas: números como display de aparato (LCD/VFD) --- */
-[data-efectos~="pantallas"] .font-mono { color: hsl(var(--primary)); text-shadow: 0 0 6px hsl(var(--primary) / 0.55); }
+html[data-efectos~="pantallas"] .font-mono:not(.vista-estilo *),
+.vista-estilo[data-efectos~="pantallas"] .font-mono { color: hsl(var(--primary)); text-shadow: 0 0 6px hsl(var(--primary) / 0.55); }
+
+/* Barlow Condensed y VT323 son angostas: en LCD todo un poco más grande y espaciado */
+html[data-efectos~="pantallas"] body,
+.vista-estilo[data-efectos~="pantallas"] { font-size: 17px; letter-spacing: 0.02em; line-height: 1.5; }
+html[data-efectos~="pantallas"] .font-mono:not(.vista-estilo *),
+.vista-estilo[data-efectos~="pantallas"] .font-mono { font-size: 1.2em; letter-spacing: 0.05em; }
+
+/* La vista previa no hereda los efectos de texto del documento */
+.vista-estilo { text-shadow: none; text-align: left; }

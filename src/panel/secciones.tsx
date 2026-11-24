@@ -1,6 +1,6 @@
 // Secciones del panel de la finca. Todas usan solo tokens del estilo activo (bg-card, text-ok,
 // border-border, font-mono...), así que cualquier acomodo funciona con cualquier estilo.
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { Link } from "react-router-dom"
 import type { DatosPanel } from "./usePanel"
 import { fmt, haceCuanto, UMBRAL_SECO, type Alerta, type EstadoNodo, type Nodo } from "./datos"
@@ -119,7 +119,7 @@ export function Kpis({ d, variante = "rejilla", sinHumedad = false }: { d: Datos
   }
   if (variante === "tira") {
     return (
-      <div className="flex flex-wrap gap-x-6 gap-y-2 border-y border-border py-3 text-sm">
+      <div className="flex flex-wrap gap-x-6 gap-y-2 border-y border-border py-3 text-base">
         {items.map((k) => (
           <span key={k.campo}><span className="text-muted-foreground">{k.etiqueta}</span> <span className="font-mono font-medium">{fmt(k.valor, k.dec, k.unidad)}</span></span>
         ))}
@@ -393,21 +393,55 @@ export function MapaCalor({ d }: { d: DatosPanel }) {
 
 // ---------- alertas y pronóstico ----------
 
+const CLAVE_ATENDIDAS = "msa-atendidas"
+const VIGENCIA_ATENDIDA_MS = 24 * 3600e3
+
+function leerAtendidas(): Record<string, number> {
+  try {
+    const todas = JSON.parse(localStorage.getItem(CLAVE_ATENDIDAS) || "{}") as Record<string, number>
+    const ahora = Date.now()
+    return Object.fromEntries(Object.entries(todas).filter(([, t]) => ahora - t < VIGENCIA_ATENDIDA_MS))
+  } catch {
+    return {}
+  }
+}
+
+/** Pendientes que se pueden marcar como atendidos (se recuerdan 24 h en este navegador). */
+function ListaTareas({ lista }: { lista: Alerta[] }) {
+  const [atendidas, setAtendidas] = useState(leerAtendidas)
+  const alternar = (clave: string) => {
+    const nuevas = { ...atendidas }
+    if (nuevas[clave]) delete nuevas[clave]
+    else nuevas[clave] = Date.now()
+    setAtendidas(nuevas)
+    localStorage.setItem(CLAVE_ATENDIDAS, JSON.stringify(nuevas))
+  }
+  // Las atendidas bajan al final
+  const ordenada = [...lista].sort((a, b) => Number(!!atendidas[a.titulo]) - Number(!!atendidas[b.titulo]))
+  const hechas = ordenada.filter((a) => atendidas[a.titulo]).length
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-xs text-muted-foreground">Marca lo que ya atendiste: se recuerda 24 h en este navegador. {hechas ? `${hechas} de ${lista.length} atendidas.` : ""}</p>
+      {ordenada.map((a) => {
+        const hecha = !!atendidas[a.titulo]
+        return (
+          <label key={a.titulo} className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border border-border bg-card p-3 ${hecha ? "opacity-55" : ""}`}>
+            <input type="checkbox" checked={hecha} onChange={() => alternar(a.titulo)} className="mt-1 h-5 w-5 shrink-0 accent-[hsl(var(--primary))]" />
+            <span>
+              <b className={hecha ? "line-through" : CLASE_NIVEL[a.nivel]}>{a.titulo}</b>
+              <span className="block text-sm text-muted-foreground">{hecha ? `Atendida ${haceCuanto(Math.round((Date.now() - atendidas[a.titulo]) / 60000))}` : a.detalle}</span>
+            </span>
+          </label>
+        )
+      })}
+    </div>
+  )
+}
+
 export function Alertas({ d, variante = "lista" }: { d: DatosPanel; variante?: "lista" | "issues" | "tareas" | "bloques" }) {
   const lista = todasLasAlertas(d)
   if (!lista.length) return <p className="text-sm text-ok">Sin pendientes. Todo en orden.</p>
-  if (variante === "tareas") {
-    return (
-      <div className="flex flex-col gap-2">
-        {lista.map((a, i) => (
-          <label key={i} className="flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border border-border bg-card p-3">
-            <input type="checkbox" className="mt-1 h-5 w-5 accent-[hsl(var(--primary))]" />
-            <span><b className={CLASE_NIVEL[a.nivel]}>{a.titulo}</b><span className="block text-sm text-muted-foreground">{a.detalle}</span></span>
-          </label>
-        ))}
-      </div>
-    )
-  }
+  if (variante === "tareas") return <ListaTareas lista={lista} />
   if (variante === "bloques") {
     return (
       <div className="flex flex-col gap-3">
@@ -441,15 +475,17 @@ export function Pronostico({ d, variante = "tarjetas" }: { d: DatosPanel; varian
   if (!dias.length) return <p className="text-sm text-muted-foreground">Sin pronóstico disponible.</p>
   if (variante === "tabla") {
     return (
-      <div className="flex flex-col">
-        {dias.map((x) => (
-          <div key={x.fecha} className="flex justify-between gap-3 border-t border-border py-2 font-mono text-sm first:border-t-0">
-            <span className="font-sans">{x.etiqueta}</span>
-            <span className={x.tMax !== null && x.tMax >= 35 ? "text-warn" : ""}>{fmt(x.tMax, 0, "°")}</span>
-            <span className="text-muted-foreground">lluvia {fmt(x.lluviaMm, 1, "mm")}</span>
-          </div>
-        ))}
-      </div>
+      <table className="w-full border-collapse text-sm">
+        <tbody>
+          {dias.map((x) => (
+            <tr key={x.fecha} className="border-t border-border first:border-t-0">
+              <td className="py-2 pr-3 text-left">{x.etiqueta}</td>
+              <td className={`py-2 px-3 text-right font-mono ${x.tMax !== null && x.tMax >= 35 ? "text-warn" : ""}`}>{x.tMax === null ? "—" : `${Math.round(x.tMax)}°`}</td>
+              <td className="py-2 pl-3 text-right font-mono text-muted-foreground">{x.lluviaMm === null ? "—" : `${x.lluviaMm.toFixed(1)} mm`}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     )
   }
   if (variante === "barras") {
@@ -485,7 +521,7 @@ export function Bitacora({ d, cuantas = 8 }: { d: DatosPanel; cuantas?: number }
   const ultimas = d.panel.nodos.flatMap((n) => n.serie.slice(-3)).sort((a, b) => b.fecha.getTime() - a.fecha.getTime()).slice(0, cuantas)
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-[520px] font-mono text-xs leading-7">
+      <div className="min-w-[560px] text-left font-mono text-[13px] leading-7">
         {ultimas.map((l, i) => (
           <div key={i} className="whitespace-nowrap">
             <span className="text-muted-foreground">{l.fecha.toLocaleTimeString("es-MX", { hour12: false })}</span>{" "}

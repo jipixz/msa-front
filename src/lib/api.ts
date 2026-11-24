@@ -4,7 +4,7 @@ import axios from "axios"
 export function normalizarApiUrl(raw: string | undefined) {
   return (raw || "http://localhost:5000").replace(/\/+$/, "")
 }
-export const API_URL = normalizarApiUrl((import.meta as any).env?.VITE_API_URL)
+export const API_URL = normalizarApiUrl(import.meta.env.VITE_API_URL)
 
 // --- Cloudflare Access -------------------------------------------------------------------
 // msabackend y fastapimsa están detrás de Cloudflare Access. Cuando la cookie
@@ -19,7 +19,7 @@ const REAUTH_INTERVALO_MS = 60_000  // no repetir la redirección más de una ve
 // Dependencias inyectables: las pruebas las reemplazan (en jsdom no se puede simular
 // window.location y Vitest no propaga import.meta.env al módulo).
 export const accessDeps = {
-  prod: Boolean((import.meta as any).env?.PROD),
+  prod: Boolean(import.meta.env.PROD),
   navegar: (url: string) => window.location.assign(url),
 }
 
@@ -80,3 +80,12 @@ api.interceptors.response.use(
     return Promise.reject(error)
   },
 )
+
+/** Mensaje legible de un error: el que mandó el backend, el del Error o el texto por defecto. */
+export function mensajeError(e: unknown, porDefecto = "Ocurrió un error") {
+  if (axios.isAxiosError(e)) {
+    const data = e.response?.data as { message?: unknown } | undefined
+    if (typeof data?.message === "string") return data.message
+  }
+  return e instanceof Error && e.message ? e.message : porDefecto
+}

@@ -367,7 +367,7 @@ export default function ProductionPage() {
 
     // Aplicar ordenamiento
     registros.sort((a, b) => {
-      let valorA: any, valorB: any
+      let valorA: number | string, valorB: number | string
       
       switch (ordenarPor) {
         case "fecha_cosecha":
@@ -387,8 +387,8 @@ export default function ProductionPage() {
           valorB = b.humedad_porcentaje
           break
         default:
-          valorA = a[ordenarPor as keyof ProductionRecord]
-          valorB = b[ordenarPor as keyof ProductionRecord]
+          valorA = String(a[ordenarPor as keyof ProductionRecord] ?? "")
+          valorB = String(b[ordenarPor as keyof ProductionRecord] ?? "")
       }
 
       if (ordenDescendente) {
@@ -440,7 +440,7 @@ export default function ProductionPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="flex min-h-[70vh] w-full items-center justify-center" role="status">
         <div className="flex items-center space-x-2">
           <Loader2 className="h-6 w-6 animate-spin" />
           <span>Cargando datos de producción...</span>
@@ -540,7 +540,7 @@ export default function ProductionPage() {
                 {/* Calidad */}
                 <div className="space-y-2">
                   <Label htmlFor="calidad">Calidad *</Label>
-                  <Select value={formData.calidad} onValueChange={(value) => setFormData(prev => ({ ...prev, calidad: value as any }))}>
+                  <Select value={formData.calidad} onValueChange={(value) => setFormData(prev => ({ ...prev, calidad: value as typeof prev.calidad }))}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -584,7 +584,7 @@ export default function ProductionPage() {
                 {/* Método de secado */}
                 <div className="space-y-2">
                   <Label htmlFor="metodo_secado">Método de Secado *</Label>
-                  <Select value={formData.metodo_secado} onValueChange={(value) => setFormData(prev => ({ ...prev, metodo_secado: value as any }))}>
+                  <Select value={formData.metodo_secado} onValueChange={(value) => setFormData(prev => ({ ...prev, metodo_secado: value as typeof prev.metodo_secado }))}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -801,7 +801,7 @@ export default function ProductionPage() {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 max-w-2xl">
+          <TabsList className="mx-auto grid w-full max-w-2xl grid-cols-2 md:grid-cols-4">
             <TabsTrigger value="overview" className="text-xs md:text-sm">Resumen</TabsTrigger>
             <TabsTrigger value="history" className="text-xs md:text-sm">Historial</TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs md:text-sm">Análisis</TabsTrigger>
@@ -824,7 +824,7 @@ export default function ProductionPage() {
                       <BarChart data={stats?.produccion_mensual || []}>
                         <XAxis dataKey="mes" />
                         <YAxis />
-                        <Tooltip formatter={(value: any) => [`${value} kg`, 'Producción']} />
+                        <Tooltip formatter={(value: number | string) => [`${value} kg`, 'Producción']} />
                         <Bar dataKey="cantidad" fill="hsl(var(--chart-1))" />
                       </BarChart>
                     </ResponsiveContainer>
@@ -1164,7 +1164,7 @@ export default function ProductionPage() {
                       <LineChart data={productionRecords.slice(0, 20)}>
                         <XAxis dataKey="fecha_cosecha" tickFormatter={formatDate} />
                         <YAxis />
-                        <Tooltip formatter={(value: any) => [formatCurrency(Number(value)), 'Precio/kg']} />
+                        <Tooltip formatter={(value: number | string) => [formatCurrency(Number(value)), 'Precio/kg']} />
                         <Line type="monotone" dataKey="precio_kg" stroke="hsl(var(--warn))" strokeWidth={2} />
                       </LineChart>
                     </ResponsiveContainer>
@@ -1183,7 +1183,7 @@ export default function ProductionPage() {
                       <LineChart data={productionRecords.slice(0, 20)}>
                         <XAxis dataKey="fecha_cosecha" tickFormatter={formatDate} />
                         <YAxis />
-                        <Tooltip formatter={(value: any) => [`${value}%`, 'Humedad']} />
+                        <Tooltip formatter={(value: number | string) => [`${value}%`, 'Humedad']} />
                         <Line type="monotone" dataKey="humedad_porcentaje" stroke="hsl(var(--info))" strokeWidth={2} />
                         {productionRecords[0]?.humedad_final && (
                           <Line type="monotone" dataKey="humedad_final" stroke="hsl(var(--ok))" strokeWidth={2} strokeDasharray="5 5" />
@@ -1247,7 +1247,7 @@ export default function ProductionPage() {
                       ).map(([parcela, cantidad]) => ({ parcela, cantidad }))}>
                         <XAxis dataKey="parcela" />
                         <YAxis />
-                        <Tooltip formatter={(value: any) => [`${value} kg`, 'Producción']} />
+                        <Tooltip formatter={(value: number | string) => [`${value} kg`, 'Producción']} />
                         <Bar dataKey="cantidad" fill="hsl(var(--ok))" />
                       </BarChart>
                     </ResponsiveContainer>

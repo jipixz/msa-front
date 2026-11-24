@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react'
 import { PredictionData, AlertsData } from '../types/prediction.types'
 import { API_BASE_URL } from '../config/constants'
 import { formatDayLabel } from '../utils/formatters'
-import { apiFetch } from "@/lib/api"
+import { apiFetch } from "@/lib/api"
+
+type PuntoCrudo = { predicted?: number; prediccion_valor?: number; day?: string; hora_futura?: string; [k: string]: unknown }
+
 
 export const usePredictionData = () => {
   const [loading, setLoading] = useState(true)
@@ -22,10 +25,10 @@ export const usePredictionData = () => {
       
       // Transformar datos si es necesario
       if (data.predictions) {
-        data.predictions = data.predictions.map((item: any) => ({
+        data.predictions = data.predictions.map((item: PuntoCrudo) => ({
           ...item,
           predicted: item.predicted || item.prediccion_valor,
-          day: item.day || formatDayLabel(new Date(item.hora_futura).toISOString().split('T')[0])
+          day: item.day || formatDayLabel(new Date(item.hora_futura ?? Date.now()).toISOString().split('T')[0])
         }))
       }
       

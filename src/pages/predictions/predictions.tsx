@@ -23,6 +23,9 @@ import 'leaflet/dist/leaflet.css'
 import { useTimeAgo } from './hooks/useTimeAgo'
 import { apiFetch } from "@/lib/api"
 
+type PuntoCrudo = { predicted?: number; prediccion_valor?: number; day?: string; hora_futura?: string; [k: string]: unknown }
+
+
 // Tipos para los datos de la API
 interface PredictionData {
   predictions: Array<{
@@ -358,7 +361,7 @@ const WeatherMap = () => {
         </div>
 
         {/* Mapa simplificado */}
-        <div className="h-96 w-full rounded-lg overflow-hidden border border-border relative">
+        <div className="h-96 w-full rounded-lg overflow-hidden border border-border relative isolate z-0">
           <MapContainer
             center={[CERRO_BLANCO_COORDS.lat, CERRO_BLANCO_COORDS.lng]}
             zoom={12}
@@ -475,7 +478,7 @@ const WeatherMap = () => {
         </div>
 
         {/* Leyenda simplificada */}
-        {Object.entries(activeWeatherTiles).some(([_, isActive]) => isActive) && (
+        {Object.values(activeWeatherTiles).some((isActive) => isActive) && (
           <div className="mt-4 p-3 bg-muted rounded-lg">
             <p className="text-xs text-foreground mb-2">
               <strong>Capas activas:</strong>
@@ -532,10 +535,10 @@ export default function PredictionsPage() {
       
       // Transformar datos si es necesario
       if (data.predictions) {
-        data.predictions = data.predictions.map((item: any) => ({
+        data.predictions = data.predictions.map((item: PuntoCrudo) => ({
           ...item,
           predicted: item.predicted || item.prediccion_valor,
-          day: item.day || formatDayLabel(new Date(item.hora_futura).toISOString().split('T')[0])
+          day: item.day || formatDayLabel(new Date(item.hora_futura ?? Date.now()).toISOString().split('T')[0])
         }));
       }
       
@@ -626,7 +629,7 @@ export default function PredictionsPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="flex min-h-[70vh] w-full items-center justify-center" role="status">
         <div className="flex items-center space-x-2">
           <Loader2 className="h-6 w-6 animate-spin" />
           <span>Cargando predicciones...</span>

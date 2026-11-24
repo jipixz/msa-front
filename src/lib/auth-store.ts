@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { api } from "./api"
+import { api, mensajeError } from "./api"
 
 type User = {
   email: string
@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const { data } = await api.get("/auth/me")
       set({ user: data.user, loading: false })
-    } catch (e: any) {
+    } catch {
       set({ user: null, loading: false })
     }
   },
@@ -46,8 +46,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       await api.post("/auth/login", { email, password })
       const { data } = await api.get("/auth/me")
       set({ user: data.user, loading: false })
-    } catch (e: any) {
-      set({ error: e?.response?.data?.message || "Error al iniciar sesión", loading: false })
+    } catch (e) {
+      set({ error: mensajeError(e, "Error al iniciar sesión"), loading: false })
       throw e
     }
   },
