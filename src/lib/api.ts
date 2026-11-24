@@ -1,7 +1,10 @@
 import axios from "axios"
 
 // Sin "/" final: las rutas se concatenan como `${API_URL}/api/...` y una doble barra da 404.
-export const API_URL = ((import.meta as any).env?.VITE_API_URL || "http://localhost:5000").replace(/\/+$/, "")
+export function normalizarApiUrl(raw: string | undefined) {
+  return (raw || "http://localhost:5000").replace(/\/+$/, "")
+}
+export const API_URL = normalizarApiUrl((import.meta as any).env?.VITE_API_URL)
 
 // --- Cloudflare Access -------------------------------------------------------------------
 // msabackend y fastapimsa están detrás de Cloudflare Access. Cuando la cookie
@@ -13,8 +16,15 @@ export const API_URL = ((import.meta as any).env?.VITE_API_URL || "http://localh
 
 const REAUTH_INTERVALO_MS = 60_000  // no repetir la redirección más de una vez por minuto
 
+// Dependencias inyectables: las pruebas las reemplazan (en jsdom no se puede simular
+// window.location y Vitest no propaga import.meta.env al módulo).
+export const accessDeps = {
+  prod: Boolean((import.meta as any).env?.PROD),
+  navegar: (url: string) => window.location.assign(url),
+}
+
 async function reautenticarSiAccessExpiro(url: string) {
-  if (!(import.meta as any).env?.PROD) return
+  if (!accessDeps.prod) return
   if (typeof window === "undefined" || !navigator.onLine) return
 
   let origin: string
@@ -39,8 +49,10 @@ async function reautenticarSiAccessExpiro(url: string) {
   if (Date.now() - ultimo < REAUTH_INTERVALO_MS) return
   sessionStorage.setItem(clave, String(Date.now()))
 
-  window.location.assign(`${origin}/access/return?to=${encodeURIComponent(window.location.href)}`)
+  accessDeps.navegar(`${origin}/access/return?to=${encodeURIComponent(window.location.href)}`)
 }
+
+export { reautenticarSiAccessExpiro }
 
 // fetch hacia nuestras APIs, siempre con cookies: si msabackend/fastapimsa están detrás
 // de Cloudflare Access, el navegador debe mandar la cookie CF_Authorization.
