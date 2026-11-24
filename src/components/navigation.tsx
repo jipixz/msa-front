@@ -103,13 +103,17 @@ export default function Navigation() {
                   {notifications.length === 0 ? (
                     <div className="px-2 py-2 text-xs text-muted-foreground">Sin notificaciones</div>
                   ) : (
-                    notifications.slice(0, 6).map(n => (
-                      <div key={n.id} className={`px-2 py-2 text-sm ${n.read ? 'opacity-70' : ''}`}>
-                        <div className="font-medium">{n.title}</div>
-                        <div className="text-xs text-muted-foreground">{n.message}</div>
-                        <div className="text-[10px] text-muted-foreground">{new Date(n.timestamp).toLocaleString('es-ES')}</div>
-                      </div>
-                    ))
+                    notifications.slice(0, 8).map(n => {
+                      const isAlert = n.kind === 'alert'
+                      const alertColor = n.priority === 'urgent' ? 'border-l-red-500' : n.priority === 'high' ? 'border-l-orange-500' : 'border-l-amber-500'
+                      return (
+                        <div key={n.id} className={`px-2 py-2 text-sm ${n.read ? 'opacity-70' : ''} ${isAlert ? `border-l-4 ${alertColor} bg-amber-50/50 dark:bg-amber-950/20` : ''}`}>
+                          <div className="font-medium">{n.title}</div>
+                          <div className="text-xs text-muted-foreground">{n.message}</div>
+                          <div className="text-[10px] text-muted-foreground">{new Date(n.timestamp).toLocaleString('es-ES')}</div>
+                        </div>
+                      )
+                    })
                   )}
                   <div className="flex gap-2 px-2 py-1">
                     <Button size="sm" variant="outline" className="h-7" onClick={markAllRead}>Marcar leídas</Button>
@@ -147,6 +151,14 @@ export default function Navigation() {
                     <DropdownMenuItem>
                       <Shield className="h-4 w-4 mr-2" />
                       Administración
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+                {user?.role === 'admin' && (
+                  <Link to="/admin/notifier">
+                    <DropdownMenuItem>
+                      <Bell className="h-4 w-4 mr-2" />
+                      Notificaciones
                     </DropdownMenuItem>
                   </Link>
                 )}

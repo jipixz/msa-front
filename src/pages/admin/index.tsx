@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 import { api } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -6,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Edit, Upload, X } from "lucide-react"
+import { Bell, Edit, Upload, X } from "lucide-react"
 
 type AdminUser = { _id: string; email: string; name?: string; role: string; isActive: boolean; provider: string; avatarUrl?: string; createdAt?: string }
 
@@ -86,6 +87,23 @@ export default function AdminPage() {
 
   return (
     <div className="p-4 grid gap-4 md:grid-cols-2">
+      <Card className="md:col-span-2">
+        <CardContent className="p-4 flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-100 rounded-lg dark:bg-green-900">
+              <Bell className="h-5 w-5 text-green-700 dark:text-green-200" />
+            </div>
+            <div>
+              <div className="font-medium">Sistema de notificaciones</div>
+              <div className="text-xs text-muted-foreground">Reglas de alerta para sensores de cacao (ntfy + Telegram)</div>
+            </div>
+          </div>
+          <Link to="/admin/notifier">
+            <Button>Gestionar reglas</Button>
+          </Link>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Usuarios</CardTitle>
