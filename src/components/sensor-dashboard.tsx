@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useAuthStore } from "@/lib/auth-store"
 import { Bell } from "lucide-react"
-import { API_URL } from "@/lib/api"
+import { API_URL, apiFetch } from "@/lib/api"
 
 // URL del servidor backend
 //const BACKEND_URL = "http://192.168.0.64:5000"
@@ -150,7 +150,7 @@ export function SensorDashboard() {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      withCredentials: false,
+      withCredentials: true,
       timeout: 20000
     })
 
@@ -185,7 +185,7 @@ export function SensorDashboard() {
     })
 
     // Obtener datos históricos al cargar
-    fetch(`${BACKEND_URL}/api/datos-sensores`)
+    apiFetch(`${BACKEND_URL}/api/datos-sensores`)
       .then(res => res.json())
       .then(historicalData => {
         console.log("Datos históricos recibidos:", historicalData.length)

@@ -21,6 +21,7 @@ import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useTimeAgo } from './hooks/useTimeAgo'
+import { apiFetch } from "@/lib/api"
 
 // Tipos para los datos de la API
 interface PredictionData {
@@ -525,7 +526,7 @@ export default function PredictionsPage() {
   // Función para cargar predicciones de temperatura
   const loadTemperaturePredictions = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/predictions/temperature?days=7`);
+      const response = await apiFetch(`${API_BASE_URL}/predictions/temperature?days=7`);
       if (!response.ok) throw new Error("Error al cargar predicciones de temperatura");
       const data = await response.json();
       
@@ -547,7 +548,7 @@ export default function PredictionsPage() {
   // Función para cargar predicciones de humedad
   const loadHumidityPredictions = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/predictions/humidity`, {
+      const response = await apiFetch(`${API_BASE_URL}/predictions/humidity`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -568,7 +569,7 @@ export default function PredictionsPage() {
   // Función para cargar predicciones de lluvia
   const loadRainfallPredictions = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/predictions/rainfall?days=7`)
+      const response = await apiFetch(`${API_BASE_URL}/predictions/rainfall?days=7`)
       if (!response.ok) throw new Error("Error al cargar predicciones de lluvia")
       const data = await response.json()
       setRainfallData(data)
@@ -580,7 +581,7 @@ export default function PredictionsPage() {
   // Función para cargar predicciones de humedad del suelo
   const loadSoilMoisturePredictions = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/predictions/soil-moisture?days=7`)
+      const response = await apiFetch(`${API_BASE_URL}/predictions/soil-moisture?days=7`)
       if (!response.ok) throw new Error("Error al cargar predicciones de humedad del suelo")
       const data = await response.json()
       setSoilMoistureData(data)
@@ -592,7 +593,7 @@ export default function PredictionsPage() {
   // Función para cargar alertas
   const loadAlerts = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/predictions/alerts`)
+      const response = await apiFetch(`${API_BASE_URL}/predictions/alerts`)
       if (!response.ok) throw new Error("Error al cargar alertas")
       const data = await response.json()
       setAlertsData(data)

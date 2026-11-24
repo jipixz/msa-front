@@ -25,7 +25,7 @@ export const useNotificationsStore = create<NotificationsState>((set) => ({
 // Lightweight initializer to listen to backend events
 export function initNotifications(backUrl: string) {
   if (socket) return
-  socket = io(backUrl, { transports: ['websocket'], withCredentials: false })
+  socket = io(backUrl, { transports: ['websocket'], withCredentials: true })
   socket.on('nueva-lectura', (payload: any) => {
     const n: Notification = {
       id: String(Date.now()),

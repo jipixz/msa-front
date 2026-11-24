@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { PredictionData, AlertsData } from '../types/prediction.types'
 import { API_BASE_URL } from '../config/constants'
 import { formatDayLabel } from '../utils/formatters'
+import { apiFetch } from "@/lib/api"
 
 export const usePredictionData = () => {
   const [loading, setLoading] = useState(true)
@@ -15,7 +16,7 @@ export const usePredictionData = () => {
   // Función para cargar predicciones de temperatura
   const loadTemperaturePredictions = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/predictions/temperature?days=7`)
+      const response = await apiFetch(`${API_BASE_URL}/predictions/temperature?days=7`)
       if (!response.ok) throw new Error("Error al cargar predicciones de temperatura")
       const data = await response.json()
       
@@ -37,7 +38,7 @@ export const usePredictionData = () => {
   // Función para cargar predicciones de humedad
   const loadHumidityPredictions = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/predictions/humidity`, {
+      const response = await apiFetch(`${API_BASE_URL}/predictions/humidity`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +59,7 @@ export const usePredictionData = () => {
   // Función para cargar predicciones de lluvia
   const loadRainfallPredictions = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/predictions/rainfall?days=7`)
+      const response = await apiFetch(`${API_BASE_URL}/predictions/rainfall?days=7`)
       if (!response.ok) throw new Error("Error al cargar predicciones de lluvia")
       const data = await response.json()
       setRainfallData(data)
@@ -70,7 +71,7 @@ export const usePredictionData = () => {
   // Función para cargar predicciones de humedad del suelo
   const loadSoilMoisturePredictions = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/predictions/soil-moisture?days=7`)
+      const response = await apiFetch(`${API_BASE_URL}/predictions/soil-moisture?days=7`)
       if (!response.ok) throw new Error("Error al cargar predicciones de humedad del suelo")
       const data = await response.json()
       setSoilMoistureData(data)
@@ -82,7 +83,7 @@ export const usePredictionData = () => {
   // Función para cargar alertas
   const loadAlerts = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/predictions/alerts`)
+      const response = await apiFetch(`${API_BASE_URL}/predictions/alerts`)
       if (!response.ok) throw new Error("Error al cargar alertas")
       const data = await response.json()
       setAlertsData(data)

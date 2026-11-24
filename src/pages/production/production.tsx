@@ -17,7 +17,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { API_URL } from "@/lib/api"
+import { API_URL, apiFetch } from "@/lib/api"
 import {
   LineChart,
   Line,
@@ -135,7 +135,7 @@ export default function ProductionPage() {
   const loadProductionRecords = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`${API_BASE_URL}/api/production`)
+      const response = await apiFetch(`${API_BASE_URL}/api/production`)
       if (!response.ok) {
         throw new Error("Error al cargar registros de producción")
       }
@@ -152,7 +152,7 @@ export default function ProductionPage() {
   // Función para cargar estadísticas
   const loadStats = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/production/stats`)
+      const response = await apiFetch(`${API_BASE_URL}/api/production/stats`)
       if (!response.ok) {
         throw new Error("Error al cargar estadísticas")
       }
@@ -243,7 +243,7 @@ export default function ProductionPage() {
         imagenes: selectedImages
       }
       
-      const response = await fetch(`${API_BASE_URL}/api/production`, {
+      const response = await apiFetch(`${API_BASE_URL}/api/production`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

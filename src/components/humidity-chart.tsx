@@ -4,7 +4,7 @@ import { io } from "socket.io-client"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { API_URL } from "@/lib/api"
+import { API_URL, apiFetch } from "@/lib/api"
 
 // URL del servidor backend (cambia esto para que coincida con la dirección de tu servidor)
 //const BACKEND_URL = "http://localhost:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
@@ -33,7 +33,7 @@ export function HumidityChart() {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      withCredentials: false,
+      withCredentials: true,
       timeout: 20000
     })
 
@@ -68,7 +68,7 @@ export function HumidityChart() {
     })
 
     // Obtener datos históricos al cargar
-    fetch(`${BACKEND_URL}/api/humedad`)
+    apiFetch(`${BACKEND_URL}/api/humedad`)
       .then(res => res.json())
       .then(historicalData => {
         console.log("Datos históricos recibidos:", historicalData.length)
