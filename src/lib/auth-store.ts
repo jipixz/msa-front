@@ -2,10 +2,13 @@ import { create } from "zustand"
 import { api, mensajeError } from "./api"
 
 type User = {
+  _id?: string
   email: string
   name?: string
   role: "admin" | "user"
   avatarUrl?: string
+  /** Preferencias de interfaz guardadas en el servidor (ver theme-provider.tsx) */
+  preferencias?: unknown
 }
 
 type AuthState = {

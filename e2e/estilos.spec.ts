@@ -105,3 +105,23 @@ test("el diálogo de estilos queda encima del mapa de Predicciones", async ({ pa
   })
   expect(encima).toBe(true)
 })
+
+test("preferencias por usuario: al iniciar sesión se aplican y los cambios se guardan en el servidor", async ({ page }) => {
+  const guardadas: unknown[] = []
+  await page.route(/msabackend\.jipixz\.com|fastapimsa\.jipixz\.com/, async (route) => {
+    const req = route.request()
+    const p = new URL(req.url()).pathname
+    const json = (b: unknown) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(b) })
+    if (p.startsWith("/socket.io")) return route.abort()
+    if (p === "/auth/me") return json({ user: { ...ADMIN, preferencias: { estilo: "c07-bento", variante: "claro", modo: "claro", per: {} } } })
+    if (p === "/auth/me/preferencias" && req.method() === "PUT") { guardadas.push(req.postDataJSON()); return json({}) }
+    if (p === "/api/datos-sensores") return json(lecturas())
+    return json({ predictions: [], alerts: [] })
+  })
+  await page.goto("/")
+  await expect(page.locator("html")).toHaveAttribute("data-estilo", "c07-bento")
+  await expect(page.locator("html")).toHaveAttribute("data-variante", "claro")
+  await page.getByRole("button", { name: /cambiar estilo/i }).click()
+  await page.getByRole("dialog").getByRole("button", { name: /^Instrumentación/ }).click()
+  await expect.poll(() => guardadas.some((g) => (g as { estilo?: string }).estilo === "c09-instrumentos"), { timeout: 5000 }).toBe(true)
+})

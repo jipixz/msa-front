@@ -247,7 +247,7 @@ export function SensorDashboard() {
           <CardDescription>{config.description}</CardDescription>
           <div className="mt-1 flex items-baseline justify-center gap-2">
             <span className="font-mono text-2xl font-bold">{value === null ? "—" : `${value}${config.unit}`}</span>
-            <span className="text-sm font-medium" style={{ color: status.color }}>
+            <span className={`text-sm font-medium ${value === null ? "text-muted-foreground" : ""}`} style={value === null ? undefined : { color: status.color }}>
               {value === null ? (crudo === null || crudo === undefined ? "sin dato" : "lectura fuera de rango") : status.text}
             </span>
           </div>

@@ -12,6 +12,7 @@ export type Lectura = {
   luminosidad?: number
   lluvia?: number
   rainDigital?: boolean
+  bateria?: number // V (firmware con cableado 2)
 }
 
 export type EstadoNodo = "ok" | "seco" | "encharcado" | "sin-senal" | "fuera-de-rango"
@@ -38,7 +39,7 @@ export type Panel = {
   ultimaLectura: Date | null
 }
 
-export type CampoNumerico = "humedadSuelo" | "temperaturaDS" | "temperaturaBME" | "presion" | "humedadAire" | "luminosidad" | "lluvia"
+export type CampoNumerico = "humedadSuelo" | "temperaturaDS" | "temperaturaBME" | "presion" | "humedadAire" | "luminosidad" | "lluvia" | "bateria"
 
 // Umbrales (los mismos que las reglas por defecto del notifier en msa-back)
 export const UMBRAL_SECO = 30
@@ -54,6 +55,7 @@ export const RANGOS: Record<CampoNumerico, [number, number]> = {
   humedadAire: [0, 100],
   luminosidad: [0, 200000],
   lluvia: [0, 100],
+  bateria: [2.5, 4.5],
 }
 
 const CAMPOS = Object.keys(RANGOS) as CampoNumerico[]

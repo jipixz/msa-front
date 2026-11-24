@@ -232,7 +232,7 @@ export default function PanelFinca() {
   const d = usePanel()
   return (
     <div className="flex w-full flex-col gap-5 px-4 py-6 text-left sm:px-8" data-acomodo={estilo.acomodo}>
-      {user && <p className="text-lg font-semibold">Hola, {user.name || user.email}</p>}
+      {user && <h2 className="text-xl font-semibold">Hola, {user.name || user.email}</h2>}
       {d.error && <p role="alert" className="rounded-lg border border-bad p-3 text-sm text-bad">{d.error}. Se muestran los últimos datos disponibles.</p>}
       {d.cargando ? <p role="status" className="flex min-h-[60vh] items-center justify-center text-muted-foreground">Cargando datos de la finca…</p> : ACOMODOS[estilo.acomodo](d)}
       <EnlaceGraficas />

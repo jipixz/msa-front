@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
+import { useAuthStore } from "@/lib/auth-store"
+import { api } from "@/lib/api"
 import { ESTILO_POR_DEFECTO, ESTILOS, SIN_PERSONALIZAR, aplicarPersonalizacion, buscarEstilo, buscarVariante, variablesCss, type Estilo, type Paleta, type Personalizacion, type Variante } from "@/estilos/registro"
 
 type Theme = "dark" | "light" | "system"
@@ -53,6 +55,19 @@ function leerGuardado(storageKey: string, defaultTheme: Theme): Seleccion {
   return { estilo: ESTILO_POR_DEFECTO.estilo, variante: modo, modo, per: {} }
 }
 
+/**
+ * Preferencias guardadas en el usuario (msa-back /auth/me) → selección local.
+ * Devuelve null si no hay o no tienen la forma esperada (se conservan las del navegador).
+ */
+export function preferenciasDesdeServidor(p: unknown): Seleccion | null {
+  if (!p || typeof p !== "object") return null
+  const x = p as Record<string, unknown>
+  if (typeof x.estilo !== "string" || typeof x.variante !== "string") return null
+  if (x.modo !== "claro" && x.modo !== "oscuro") return null
+  const per = x.per && typeof x.per === "object" ? (x.per as Record<string, Personalizacion>) : {}
+  return { estilo: buscarEstilo(x.estilo).id, variante: x.variante, modo: x.modo, per }
+}
+
 /** Variante del estilo que respeta el modo preferido; si el estilo no la tiene, su primera variante. */
 export function varianteParaModo(estilo: Estilo, modo: Modo): Variante {
   return estilo.variantes.find((v) => v.paleta.oscuro === (modo === "oscuro")) ?? estilo.variantes[0]
@@ -76,6 +91,28 @@ export function ThemeProvider({ children, defaultTheme = "dark", storageKey = "v
   const estilo = buscarEstilo(sel.estilo)
   const variante = buscarVariante(estilo, sel.variante)
   const per = sel.per?.[estilo.id] ?? SIN_PERSONALIZAR
+
+  // Sincronización con el usuario: al iniciar sesión se aplican sus preferencias del servidor;
+  // después, cada cambio se guarda (con una pausa de 800 ms para no mandar una petición por clic).
+  const user = useAuthStore((s) => s.user)
+  const sincronizadoCon = useRef<string | null>(null)
+  useEffect(() => {
+    if (!user) { sincronizadoCon.current = null; return }
+    const id = user._id ?? user.email
+    if (sincronizadoCon.current === id) return
+    const delServidor = preferenciasDesdeServidor(user.preferencias)
+    if (delServidor) setSel(delServidor)
+    sincronizadoCon.current = id
+  }, [user])
+  useEffect(() => {
+    if (!user || sincronizadoCon.current !== (user._id ?? user.email)) return
+    const t = setTimeout(() => {
+      api.put("/auth/me/preferencias", { estilo: sel.estilo, variante: sel.variante, modo: sel.modo, per: sel.per ?? {} }).catch(() => {
+        // Sin conexión: quedan guardadas en el navegador y se suben en el siguiente cambio
+      })
+    }, 800)
+    return () => clearTimeout(t)
+  }, [sel, user])
   const paleta = useMemo(() => aplicarPersonalizacion(estilo, variante, per), [estilo, variante, per])
 
   useEffect(() => {

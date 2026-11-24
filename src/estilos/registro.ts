@@ -111,7 +111,7 @@ export const ESTILOS: Estilo[] = [
     radio: "0px", efectos: ["filetes"],
     variantes: [
       { id: "oscuro", nombre: "Oscuro", paleta: { oscuro: true, fondo: "#0a0a0a", superficie: "#0a0a0a", superficie2: "#171717", borde: "#2e2e2e", texto: "#f5f5f5", texto2: "#a3a3a3", acento: "#ff5f1f", textoSobreAcento: "#0a0a0a", ok: "#d4d4d4", warn: "#ff5f1f", bad: "#ff5f1f", info: "#f5f5f5", series: ["#f5f5f5", "#a3a3a3", "#ff5f1f", "#737373", "#d4d4d4"] } },
-      { id: "claro", nombre: "Claro", paleta: { oscuro: false, fondo: "#ffffff", superficie: "#ffffff", superficie2: "#f5f5f5", borde: "#d4d4d4", texto: "#0a0a0a", texto2: "#5c5c5c", acento: "#c43c00", textoSobreAcento: "#ffffff", ok: "#262626", warn: "#c43c00", bad: "#c43c00", info: "#0a0a0a", series: ["#0a0a0a", "#5c5c5c", "#c43c00", "#a3a3a3", "#262626"] } },
+      { id: "claro", nombre: "Claro", paleta: { oscuro: false, fondo: "#ffffff", superficie: "#ffffff", superficie2: "#f5f5f5", borde: "#d4d4d4", texto: "#0a0a0a", texto2: "#5c5c5c", acento: "#c43c00", textoSobreAcento: "#ffffff", ok: "#262626", warn: "#c43c00", bad: "#c43c00", info: "#0a0a0a", series: ["#0a0a0a", "#5c5c5c", "#c43c00", "#737373", "#262626"] } },
     ],
   },
   {
@@ -232,7 +232,7 @@ export const ESTILOS: Estilo[] = [
     googleFonts: "family=Archivo+Black&family=Archivo:wght@400;600;800&family=Space+Mono:wght@400;700",
     radio: "0px", efectos: ["brutal", "mayusculas"],
     variantes: [
-      { id: "claro", nombre: "Claro", paleta: { oscuro: false, fondo: "#ffffff", superficie: "#ffffff", superficie2: "#f2f2f2", borde: "#000000", texto: "#000000", texto2: "#262626", acento: "#000000", textoSobreAcento: "#ffe600", ok: "#000000", warn: "#000000", bad: "#000000", info: "#000000", series: ["#000000", "#ffe600", "#555555", "#999999", "#222222"] } },
+      { id: "claro", nombre: "Claro", paleta: { oscuro: false, fondo: "#ffffff", superficie: "#ffffff", superficie2: "#f2f2f2", borde: "#000000", texto: "#000000", texto2: "#262626", acento: "#000000", textoSobreAcento: "#ffe600", ok: "#000000", warn: "#000000", bad: "#000000", info: "#000000", series: ["#000000", "#a68a00", "#555555", "#6b6b6b", "#222222"] } },
       { id: "oscuro", nombre: "Oscuro", paleta: { oscuro: true, fondo: "#000000", superficie: "#000000", superficie2: "#141414", borde: "#ffffff", texto: "#ffffff", texto2: "#e0e0e0", acento: "#ffe600", textoSobreAcento: "#000000", ok: "#ffffff", warn: "#ffe600", bad: "#ffe600", info: "#ffffff", series: ["#ffffff", "#ffe600", "#aaaaaa", "#777777", "#dddddd"] } },
     ],
   },
@@ -265,8 +265,8 @@ export const ESTILOS: Estilo[] = [
     googleFonts: "family=Noto+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500",
     radio: "6px", efectos: [],
     variantes: [
-      { id: "oscuro", nombre: "Oscuro", paleta: { oscuro: true, fondo: "#0d1117", superficie: "#0d1117", superficie2: "#161b22", borde: "#30363d", texto: "#e6edf3", texto2: "#9198a1", acento: "#4493f8", textoSobreAcento: "#0d1117", ok: "#58a6ff", warn: "#f0883e", bad: "#f85149", info: "#4493f8", series: ["#0c2d48", "#0f4c81", "#1f6feb", "#58a6ff", "#f0883e"] } },
-      { id: "claro", nombre: "Claro", paleta: { oscuro: false, fondo: "#ffffff", superficie: "#ffffff", superficie2: "#f6f8fa", borde: "#d1d9e0", texto: "#1f2328", texto2: "#59636e", acento: "#0969da", textoSobreAcento: "#ffffff", ok: "#0550ae", warn: "#bc4c00", bad: "#cf222e", info: "#0969da", series: ["#ddf4ff", "#80ccff", "#218bff", "#0550ae", "#bc4c00"] } },
+      { id: "oscuro", nombre: "Oscuro", paleta: { oscuro: true, fondo: "#0d1117", superficie: "#0d1117", superficie2: "#161b22", borde: "#30363d", texto: "#e6edf3", texto2: "#9198a1", acento: "#4493f8", textoSobreAcento: "#0d1117", ok: "#58a6ff", warn: "#f0883e", bad: "#f85149", info: "#4493f8", series: ["#4493f8", "#3fb950", "#f0883e", "#ab7df8", "#f85149"] } },
+      { id: "claro", nombre: "Claro", paleta: { oscuro: false, fondo: "#ffffff", superficie: "#ffffff", superficie2: "#f6f8fa", borde: "#d1d9e0", texto: "#1f2328", texto2: "#59636e", acento: "#0969da", textoSobreAcento: "#ffffff", ok: "#0550ae", warn: "#bc4c00", bad: "#cf222e", info: "#0969da", series: ["#0969da", "#1a7f37", "#bc4c00", "#8250df", "#cf222e"] } },
     ],
   },
 ]
@@ -412,6 +412,7 @@ export function aplicarPersonalizacion(estilo: Estilo, variante: Variante, per?:
     }
     // Garantiza que los estados se lean sobre el fondo nuevo
     for (const k of ["ok", "warn", "bad", "info"] as const) p[k] = ajustarContraste(p[k], p.superficie, 4.5)
+    p.series = p.series.map((c) => ajustarContraste(c, p.superficie, 3)) as Paleta["series"]
     if (contraste(p.acento, p.superficie) < 3) p.acento = ajustarContraste(p.acento, p.superficie, 3)
   }
 

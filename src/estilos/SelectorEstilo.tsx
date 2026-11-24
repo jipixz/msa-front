@@ -53,36 +53,56 @@ function VistaPrevia({ estilo, variante, per }: { estilo: Estilo; variante: Vari
   )
 }
 
+// Componentes fuera de Personalizar: si se declaran dentro, React los vuelve a montar en cada
+// cambio y el selector de color nativo se cierra al primer movimiento.
+function Chip({ activo, onClick, children, etiqueta }: { activo: boolean; onClick: () => void; children: React.ReactNode; etiqueta: string }) {
+  return (
+    <button type="button" aria-pressed={activo} aria-label={etiqueta} title={etiqueta} onClick={onClick}
+      className={`flex min-h-9 items-center gap-1.5 border px-2 text-xs ${activo ? "border-primary ring-2 ring-primary" : "border-border hover:bg-accent"}`}>
+      {children}
+    </button>
+  )
+}
+
+/** Selector de color libre: se puede arrastrar; la app se actualiza mientras arrastras. */
+function ColorLibre({ valor, onCambio, etiqueta }: { valor: string | null; onCambio: (c: string) => void; etiqueta: string }) {
+  const [local, setLocal] = useState(valor ?? "#31adff")
+  useEffect(() => { if (valor) setLocal(valor) }, [valor])
+  return (
+    <label className="flex min-h-9 cursor-pointer items-center gap-1 border border-border px-2 text-xs hover:bg-accent">
+      <input type="color" aria-label={etiqueta} value={local}
+        onChange={(ev) => { setLocal(ev.target.value); onCambio(ev.target.value) }}
+        className="h-6 w-7 cursor-pointer border-0 bg-transparent p-0" />
+      Otro
+    </label>
+  )
+}
+
+function FilaAcento({ titulo, valor, onCambio }: { titulo: string; valor: string | null; onCambio: (c: string | null) => void }) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="w-36 text-xs text-muted-foreground">{titulo}</span>
+      <Chip activo={!valor} onClick={() => onCambio(null)} etiqueta="Del estilo">Del estilo</Chip>
+      {ACENTOS_SUGERIDOS.map((c) => (
+        <button key={c} type="button" aria-pressed={valor === c} aria-label={`${titulo} ${c}`} title={c} onClick={() => onCambio(c)}
+          className={`h-8 w-8 border ${valor === c ? "border-foreground ring-2 ring-primary" : "border-border"}`} style={{ background: c, borderRadius: 999 }} />
+      ))}
+      <ColorLibre valor={valor} onCambio={onCambio} etiqueta={`${titulo}: color libre`} />
+    </div>
+  )
+}
+
+const FONDOS_ELEGIBLES: { id: FondoId; nombre: string; muestra: string[] }[] = [
+  { id: "estilo", nombre: "Del estilo", muestra: [] },
+  ...FONDOS.map((f) => ({ id: f.id, nombre: f.nombre, muestra: [f.colores.fondo, f.colores.superficie, f.colores.texto] })),
+]
+
 /** Fondo y acentos del estilo actual (se guardan por estilo). */
 function Personalizar() {
   const { estilo, personalizacionDe, setPersonalizacion, paleta } = useTheme()
   const per = personalizacionDe()
   const cambiar = (cambio: Partial<Personalizacion>) => setPersonalizacion(estilo.id, { ...per, ...cambio })
   const personalizado = per.fondo !== "estilo" || per.acento || per.acento2
-  const fondos: { id: FondoId; nombre: string; muestra: string[] }[] = [
-    { id: "estilo", nombre: "Del estilo", muestra: [] },
-    ...FONDOS.map((f) => ({ id: f.id, nombre: f.nombre, muestra: [f.colores.fondo, f.colores.superficie, f.colores.texto] })),
-  ]
-  const Chip = ({ activo, onClick, children, etiqueta }: { activo: boolean; onClick: () => void; children: React.ReactNode; etiqueta: string }) => (
-    <button type="button" aria-pressed={activo} aria-label={etiqueta} title={etiqueta} onClick={onClick}
-      className={`flex min-h-9 items-center gap-1.5 border px-2 text-xs ${activo ? "border-primary ring-2 ring-primary" : "border-border hover:bg-accent"}`}>
-      {children}
-    </button>
-  )
-  const FilaAcento = ({ campo, titulo }: { campo: "acento" | "acento2"; titulo: string }) => (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <span className="w-36 text-xs text-muted-foreground">{titulo}</span>
-      <Chip activo={!per[campo]} onClick={() => cambiar({ [campo]: null })} etiqueta="Del estilo">Del estilo</Chip>
-      {ACENTOS_SUGERIDOS.map((c) => (
-        <button key={c} type="button" aria-pressed={per[campo] === c} aria-label={`${titulo} ${c}`} title={c} onClick={() => cambiar({ [campo]: c })}
-          className={`h-8 w-8 border ${per[campo] === c ? "border-foreground ring-2 ring-primary" : "border-border"}`} style={{ background: c, borderRadius: 999 }} />
-      ))}
-      <label className="flex min-h-9 cursor-pointer items-center gap-1 border border-border px-2 text-xs hover:bg-accent">
-        <input type="color" value={per[campo] ?? "#31adff"} onChange={(ev) => cambiar({ [campo]: ev.target.value })} className="h-6 w-7 cursor-pointer border-0 bg-transparent p-0" />
-        Otro
-      </label>
-    </div>
-  )
   return (
     <section aria-label={`Personalizar ${estilo.nombre}`} className="flex flex-col gap-2 border border-border p-3" style={{ borderRadius: "var(--radius)" }}>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -91,7 +111,7 @@ function Personalizar() {
       </div>
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="w-36 text-xs text-muted-foreground">Fondo</span>
-        {fondos.map((f) => (
+        {FONDOS_ELEGIBLES.map((f) => (
           <Chip key={f.id} activo={per.fondo === f.id} onClick={() => cambiar({ fondo: f.id })} etiqueta={f.nombre}>
             {f.muestra.length > 0 && (
               <span aria-hidden="true" className="flex h-4 overflow-hidden border border-border" style={{ borderRadius: 3 }}>
@@ -102,8 +122,8 @@ function Personalizar() {
           </Chip>
         ))}
       </div>
-      <FilaAcento campo="acento" titulo="Acento" />
-      <FilaAcento campo="acento2" titulo="Acento secundario" />
+      <FilaAcento titulo="Acento" valor={per.acento} onCambio={(c) => cambiar({ acento: c })} />
+      <FilaAcento titulo="Acento secundario" valor={per.acento2} onCambio={(c) => cambiar({ acento2: c })} />
       {per.acento && paleta.acento.toLowerCase() !== per.acento.toLowerCase() && (
         <p className="text-xs text-muted-foreground">
           El acento se ajustó a <span className="font-mono" style={{ color: paleta.acento }}>{paleta.acento}</span> para que se lea sobre este fondo (contraste {contraste(paleta.acento, paleta.superficie).toFixed(1)}:1).

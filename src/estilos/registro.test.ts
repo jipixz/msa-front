@@ -90,6 +90,7 @@ describe("personalización: todo lo elegible se lee", () => {
         ["acento/superficie", p.acento, p.superficie, 3], ["sobreAcento/acento", p.textoSobreAcento, p.acento, 4.5],
         ["ok", p.ok, p.superficie, 4.5], ["warn", p.warn, p.superficie, 4.5], ["bad", p.bad, p.superficie, 4.5], ["info", p.info, p.superficie, 4.5],
       ]
+      p.series.forEach((c, i) => req.push([`chart-${i + 1}`, c, p.superficie, 3]))
       for (const [n, a, b, min] of req) if (contraste(a, b) < min) fallas.push(`${e.id}/${v.id}/${fondo}/${acento}: ${n} ${contraste(a, b).toFixed(2)}`)
     }
     expect(combinaciones).toBeGreaterThan(4000) // 42 variantes × 7 fondos × 15 acentos
@@ -108,4 +109,19 @@ describe("personalización: todo lo elegible se lee", () => {
     expect(p.acento).not.toBe("#ffe600")
     expect(contraste(p.acento, p.superficie)).toBeGreaterThanOrEqual(3)
   })
+})
+
+describe("gráficas: cada serie se distingue del fondo", () => {
+  for (const e of ESTILOS) {
+    for (const v of e.variantes) {
+      it(`${e.id} / ${v.id}`, () => {
+        // ≥ 3:1 (WCAG 1.4.11, elementos gráficos) contra la superficie de las tarjetas
+        const fallas = v.paleta.series
+          .map((c, i) => ({ i, c, r: contraste(c, v.paleta.superficie) }))
+          .filter((x) => x.r < 3)
+          .map((x) => `chart-${x.i + 1} ${x.c}: ${x.r.toFixed(2)}`)
+        expect(fallas).toEqual([])
+      })
+    }
+  }
 })
