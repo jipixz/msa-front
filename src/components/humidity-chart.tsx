@@ -4,11 +4,12 @@ import { io } from "socket.io-client"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { API_URL } from "@/lib/api"
 
 // URL del servidor backend (cambia esto para que coincida con la dirección de tu servidor)
 //const BACKEND_URL = "http://localhost:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
 //const BACKEND_URL = "http://192.168.0.64:5000" // O usa "http://192.168.0.64:5000" si es tu servidor
-const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:5000";
+const BACKEND_URL = API_URL
 const INACTIVITY_TIMEOUT = 30000; // 30 segundos sin recibir datos
 
 type HumidityData = {

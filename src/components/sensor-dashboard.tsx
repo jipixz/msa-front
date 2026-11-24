@@ -8,10 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useAuthStore } from "@/lib/auth-store"
 import { Bell } from "lucide-react"
+import { API_URL } from "@/lib/api"
 
 // URL del servidor backend
 //const BACKEND_URL = "http://192.168.0.64:5000"
-const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:5000";
+const BACKEND_URL = API_URL
 const INACTIVITY_TIMEOUT = 30000; // 30 segundos sin recibir datos
 const MAX_DATA_POINTS = 20; // Máximo número de puntos a mostrar en gráficas
 

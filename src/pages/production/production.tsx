@@ -17,6 +17,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { API_URL } from "@/lib/api"
 import {
   LineChart,
   Line,
@@ -82,7 +83,7 @@ interface ProductionStats {
 }
 
 // Configuración de la API
-const API_BASE_URL = "http://localhost:5000"
+const API_BASE_URL = API_URL
 
 export default function ProductionPage() {
   const [activeTab, setActiveTab] = useState("overview")
