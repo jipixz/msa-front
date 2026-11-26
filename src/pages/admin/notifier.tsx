@@ -95,7 +95,8 @@ const FIELDS: { key: string; label: string; type?: "boolean" | "number" }[] = [
   { key: "luminosidad", label: "Luminosidad (lx)" },
   { key: "lluvia", label: "Lluvia (analógica)" },
   { key: "rainDigital", label: "Lluvia digital", type: "boolean" },
-  { key: "nodo", label: "Nodo (0-3)" },
+  { key: "sensoresFallidos", label: "Sensor sin respuesta", type: "boolean" },
+  { key: "nodo", label: "Nodo" },
 ]
 
 const OPS_NUMERIC: { value: Op; label: string }[] = [

@@ -93,3 +93,14 @@ describe("formatos", () => {
     expect(fmt(26.44, 1, "°C")).toBe("26.4 °C")
   })
 })
+
+describe("sensores sin respuesta", () => {
+  it("avisa qué sensor falló y conserva las demás mediciones", () => {
+    const ahora = new Date("2026-11-25T12:00:00Z")
+    const p = construirPanel([{ nodo: 3, fecha: "2026-11-25T11:50:00Z", humedadSuelo: 45, lluvia: 0, sensoresFallidos: ["BME280"] }], ahora)
+    expect(p.nodos[0].ultima?.humedadSuelo).toBe(45)
+    expect(p.nodos[0].estado).toBe("ok")
+    const a = p.alertas.find((x) => x.titulo === "N3 · sensor sin respuesta")
+    expect(a?.detalle).toMatch(/BME280/)
+  })
+})

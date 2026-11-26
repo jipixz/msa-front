@@ -13,6 +13,7 @@ export type Lectura = {
   lluvia?: number
   rainDigital?: boolean
   bateria?: number // V (firmware con cableado 2)
+  sensoresFallidos?: string[] // sensores que no respondieron en ese ciclo (Err del firmware)
 }
 
 export type EstadoNodo = "ok" | "seco" | "encharcado" | "sin-senal" | "fuera-de-rango"
@@ -79,6 +80,10 @@ export function normalizarLectura(doc: Record<string, unknown>): { lectura: Lect
     else fueraDeRango.push(c)
   }
   if (typeof doc.rainDigital === "boolean") lectura.rainDigital = doc.rainDigital
+  if (Array.isArray(doc.sensoresFallidos)) {
+    const s = doc.sensoresFallidos.filter((x): x is string => typeof x === "string")
+    if (s.length) lectura.sensoresFallidos = s
+  }
   return { lectura, fueraDeRango }
 }
 
@@ -136,6 +141,7 @@ export function construirPanel(docs: Record<string, unknown>[], ahora = new Date
     if (n.estado === "seco") alertas.push({ nivel: "warn", nodo: n.id, titulo: `${n.nombre} · suelo seco`, detalle: `${n.ultima?.humedadSuelo} % de humedad, bajo el umbral de ${UMBRAL_SECO} %` })
     if (n.estado === "encharcado") alertas.push({ nivel: "warn", nodo: n.id, titulo: `${n.nombre} · suelo encharcado`, detalle: `${n.ultima?.humedadSuelo} %: revisar drenaje` })
     if (n.estado === "sin-senal") alertas.push({ nivel: "bad", nodo: n.id, titulo: `${n.nombre} · sin señal`, detalle: `Último paquete ${haceCuanto(n.minutosDesdeUltima)}` })
+    if (n.estado !== "sin-senal" && n.ultima?.sensoresFallidos?.length) alertas.push({ nivel: "warn", nodo: n.id, titulo: `${n.nombre} · sensor sin respuesta`, detalle: `${n.ultima.sensoresFallidos.join(", ")}: las demás mediciones se siguen guardando` })
     if (n.estado === "fuera-de-rango") alertas.push({ nivel: "bad", nodo: n.id, titulo: `${n.nombre} · lectura imposible`, detalle: "La humedad reportada está fuera de 0–100 %: revisar el sensor" })
   }
 
