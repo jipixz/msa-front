@@ -104,3 +104,15 @@ describe("sensores sin respuesta", () => {
     expect(a?.detalle).toMatch(/BME280/)
   })
 })
+
+describe("métricas de radio", () => {
+  it("guarda RSSI y SNR del gateway sin mezclarlos con los promedios", () => {
+    const p = construirPanel([{ nodo: 2, fecha: "2026-11-26T06:00:00Z", humedadSuelo: 50, rssi: -97, snr: 6.5 }], new Date("2026-11-26T06:05:00Z"))
+    expect(p.nodos[0].ultima?.rssi).toBe(-97)
+    expect(p.nodos[0].ultima?.snr).toBe(6.5)
+    expect("rssi" in p.promedios).toBe(false)
+  })
+  it("descarta RSSI imposible", () => {
+    expect(normalizarLectura({ nodo: 1, fecha: "2026-11-26T06:00:00Z", rssi: -400 }).lectura?.rssi).toBeUndefined()
+  })
+})

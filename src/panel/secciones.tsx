@@ -244,6 +244,8 @@ export function Indicadores({ d }: { d: DatosPanel }) {
 export function TablaNodos({ d, minigraficas = false }: { d: DatosPanel; minigraficas?: boolean }) {
   // La columna de batería aparece en cuanto algún nodo la reporta (firmware con cableado 2)
   const conBateria = d.panel.nodos.some((n) => typeof n.ultima?.bateria === "number")
+  // Señal LoRa con que el gateway recibió el último paquete (cerca de -134 dBm ya no se recibe)
+  const conSenal = d.panel.nodos.some((n) => typeof n.ultima?.rssi === "number")
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[560px] border-collapse text-sm">
@@ -256,6 +258,7 @@ export function TablaNodos({ d, minigraficas = false }: { d: DatosPanel; minigra
             <th className="px-3 py-2 text-right font-medium">T. suelo</th>
             <th className="px-3 py-2 text-right font-medium">T. aire</th>
             {conBateria && <th className="px-3 py-2 text-right font-medium">Batería</th>}
+            {conSenal && <th className="px-3 py-2 text-right font-medium">Señal</th>}
             <th className="py-2 pl-3 text-right font-medium">Último dato</th>
           </tr>
         </thead>
@@ -269,6 +272,11 @@ export function TablaNodos({ d, minigraficas = false }: { d: DatosPanel; minigra
               <td className="px-3 py-2 text-right font-mono">{fmt(n.ultima?.temperaturaDS, 1, "°C")}</td>
               <td className="px-3 py-2 text-right font-mono">{fmt(n.ultima?.temperaturaBME, 1, "°C")}</td>
               {conBateria && <td className={`px-3 py-2 text-right font-mono ${(n.ultima?.bateria ?? 9) < 3.4 ? "text-warn" : ""}`}>{fmt(n.ultima?.bateria, 2, "V")}</td>}
+              {conSenal && (
+                <td className={`px-3 py-2 text-right font-mono ${(n.ultima?.rssi ?? 0) < -120 ? "text-warn" : ""}`} title={typeof n.ultima?.snr === "number" ? `SNR ${n.ultima.snr} dB` : undefined}>
+                  {fmt(n.ultima?.rssi, 0, "dBm")}
+                </td>
+              )}
               <td className="py-2 pl-3 text-right text-muted-foreground">{haceCuanto(n.minutosDesdeUltima)}</td>
             </tr>
           ))}

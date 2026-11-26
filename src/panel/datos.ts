@@ -14,6 +14,8 @@ export type Lectura = {
   rainDigital?: boolean
   bateria?: number // V (firmware con cableado 2)
   sensoresFallidos?: string[] // sensores que no respondieron en ese ciclo (Err del firmware)
+  rssi?: number // dBm con que el gateway recibió el paquete
+  snr?: number // dB
 }
 
 export type EstadoNodo = "ok" | "seco" | "encharcado" | "sin-senal" | "fuera-de-rango"
@@ -84,6 +86,9 @@ export function normalizarLectura(doc: Record<string, unknown>): { lectura: Lect
     const s = doc.sensoresFallidos.filter((x): x is string => typeof x === "string")
     if (s.length) lectura.sensoresFallidos = s
   }
+  // Métricas de radio del gateway (no son mediciones del nodo: no entran en promedios ni alertas)
+  if (typeof doc.rssi === "number" && doc.rssi >= -150 && doc.rssi <= 10) lectura.rssi = doc.rssi
+  if (typeof doc.snr === "number" && doc.snr >= -30 && doc.snr <= 30) lectura.snr = doc.snr
   return { lectura, fueraDeRango }
 }
 
